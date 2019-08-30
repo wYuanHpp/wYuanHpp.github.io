@@ -5,15 +5,19 @@
   
 
   
-  <title>Hexo</title>
+  <title>10分钟上手ast | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="什么是AST AST(Abstract Syntax Tree)简称是抽象语法树,是源代码语法结构的一种抽象表示.它以树状的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构. 比如一下代码: 1const 1 = 5;  这行代码大致会被解析为以下ast 1234567891011121314151617&amp;#123;  &quot;type&quot;: &quot;VariableDeclaration&quot;,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="10分钟上手ast">
+<meta property="og:url" content="http://yoursite.com/2019/08/29/10分钟上手ast/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="什么是AST AST(Abstract Syntax Tree)简称是抽象语法树,是源代码语法结构的一种抽象表示.它以树状的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构. 比如一下代码: 1const 1 = 5;  这行代码大致会被解析为以下ast 1234567891011121314151617&amp;#123;  &quot;type&quot;: &quot;VariableDeclaration&quot;,">
 <meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-08-30T05:01:28.984Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
+<meta name="twitter:title" content="10分钟上手ast">
+<meta name="twitter:description" content="什么是AST AST(Abstract Syntax Tree)简称是抽象语法树,是源代码语法结构的一种抽象表示.它以树状的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构. 比如一下代码: 1const 1 = 5;  这行代码大致会被解析为以下ast 1234567891011121314151617&amp;#123;  &quot;type&quot;: &quot;VariableDeclaration&quot;,">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -60,9 +64,7 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-    <article id="post-10分钟上手ast" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-10分钟上手ast" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/08/29/10分钟上手ast/" class="article-date">
   <time datetime="2019-08-29T12:06:26.000Z" itemprop="datePublished">2019-08-29</time>
@@ -75,8 +77,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/08/29/10分钟上手ast/">10分钟上手ast</a>
+    <h1 class="article-title" itemprop="name">
+      10分钟上手ast
     </h1>
   
 
@@ -119,100 +121,19 @@
     </footer>
   </div>
   
-</article>
-
-
+    
+<nav id="article-nav">
   
-    <article id="post-react-router4学习(1)" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/05/16/react-router4学习(1)/" class="article-date">
-  <time datetime="2019-05-16T15:16:58.000Z" itemprop="datePublished">2019-05-16</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/05/16/react-router4学习(1)/">react-router4学习</a>
-    </h1>
+    <a href="/2019/05/16/react-router4学习(1)/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">react-router4学习</div>
+    </a>
   
+</nav>
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>#前言 </p>
-<p>react-router4出来有很久了, 一直没有使用过, 最近计划学习一下react16以及相关的生态库, 就打算从react-router4开始了, 毕竟现在已经是大行其道了, 我会从react-router3 和roact-router4的异同来慢慢说明两者的区别</p>
-<p>#声明方式</p>
-<p>react-router3的路由声明通常是在一个文件里声明完整的路由关系,比如:</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;Router&gt;</span><br><span class="line">  &lt;Route path=<span class="string">"/"</span> component=&#123;App&#125;&gt;</span><br><span class="line">    &lt;Route path=<span class="string">"accounts"</span> component=&#123;Accounts&#125;/&gt;</span><br><span class="line">    &lt;Route path=<span class="string">"statements"</span> component=&#123;Statements&#125;&gt;</span><br><span class="line">      &lt;Route path=<span class="string">"info"</span> component=&#123;Info&#125;&gt;</span><br><span class="line">    &lt;<span class="regexp">/Router&gt;</span></span><br><span class="line"><span class="regexp">  &lt;/</span>Route&gt;</span><br><span class="line">&lt;<span class="regexp">/Router&gt;</span></span><br></pre></td></tr></table></figure>
-<p>路由相关组件之间的调用非常隐晦, 比如<code>App</code>为下级路由组件<code>Accounts</code>传递值是这样的:</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">App</span> <span class="title">extend</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      &lt;div&gt;</span><br><span class="line">        &#123;...props.children&#125; <span class="comment">// 这句就是对Accounts的调用</span></span><br><span class="line">      &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">    )</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
-<p>从上面可以看出来, 从代码逻辑上,完全看不出<code>App</code>调用了<code>Accounts</code>,这导致了代码的可读性非常的差.</p>
-<p>那么react-router4的路由声明变成了什么样子呢?<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">App</span> <span class="title">extend</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      &lt;div&gt;</span><br><span class="line">        &lt;Route path=<span class="string">"accounts"</span> component=&#123;Accounts&#125;/&gt;</span><br><span class="line">      &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">    )</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure></p>
-<p>变成了这样!是不是一目了然?现在变成了那里有路由需求, 那里声明路由的方式.熟悉<code>vue</code>的同学应该已经看出来,这种写法和<code>vue-router</code>的调用方式很相似,比较简单明了. 其实我第一次用<code>react-router4</code>的时候由于没看文档,还被坑了一次. </p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/16/react-router4学习(1)/" data-id="cjzxnj6f60001j5ro8pecfghl" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
   
 </article>
-
-
-  
-    <article id="post-2019学习计划" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/05/09/2019学习计划/" class="article-date">
-  <time datetime="2019-05-09T10:43:06.000Z" itemprop="datePublished">2019-05-09</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/05/09/2019学习计划/">2019学习计划</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>#学习计划</p>
-<ul>
-<li>react16 和相关的生态资源, 看部分源码</li>
-<li>学习webpack打包原理, 已经写一些loader和plugin</li>
-<li>babel 的深度使用学习 ast -&gt; 转换 -&gt; 再编译</li>
-<li>前端性能的深入了解, 包括测试, 监控, 调优</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/09/2019学习计划/" data-id="cjzxnj6f70002j5ro8lmcqzz7" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-
 
 </section>
         
