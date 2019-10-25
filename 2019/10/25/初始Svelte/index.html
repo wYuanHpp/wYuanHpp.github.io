@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>初始Svelte | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="初识 Svelte什么是Svelte?首先, svelte是一个前端框架, 在国内使用人数非常少, 但是如果你到github上去看它的repo,你会发现居然有25.3k的star.什么? 居然这么多? 为啥我没听过呢? 不是只有三大框架么? (问号脸?)那今天就来给大家介绍一下它和我们熟悉的另外几个常见框架react vue 有什么区别? Svelte有什么特点让我们先看一下用svelte来书写组">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初始Svelte">
+<meta property="og:url" content="http://yoursite.com/2019/10/25/初始Svelte/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="初识 Svelte什么是Svelte?首先, svelte是一个前端框架, 在国内使用人数非常少, 但是如果你到github上去看它的repo,你会发现居然有25.3k的star.什么? 居然这么多? 为啥我没听过呢? 不是只有三大框架么? (问号脸?)那今天就来给大家介绍一下它和我们熟悉的另外几个常见框架react vue 有什么区别? Svelte有什么特点让我们先看一下用svelte来书写组">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://static001.infoq.cn/resource/image/e0/7f/e0bfee0f9437fc88a1a6928738af117f.jpg">
+<meta property="og:updated_time" content="2019-10-25T06:33:04.961Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="初始Svelte">
+<meta name="twitter:description" content="初识 Svelte什么是Svelte?首先, svelte是一个前端框架, 在国内使用人数非常少, 但是如果你到github上去看它的repo,你会发现居然有25.3k的star.什么? 居然这么多? 为啥我没听过呢? 不是只有三大框架么? (问号脸?)那今天就来给大家介绍一下它和我们熟悉的另外几个常见框架react vue 有什么区别? Svelte有什么特点让我们先看一下用svelte来书写组">
+<meta name="twitter:image" content="https://static001.infoq.cn/resource/image/e0/7f/e0bfee0f9437fc88a1a6928738af117f.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-初始Svelte" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/10/25/初始Svelte/" class="article-date">
+  <time datetime="2019-10-25T06:32:25.000Z" itemprop="datePublished">2019-10-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      初始Svelte
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="初识-Svelte"><a href="#初识-Svelte" class="headerlink" title="初识 Svelte"></a>初识 Svelte</h1><h2 id="什么是Svelte"><a href="#什么是Svelte" class="headerlink" title="什么是Svelte?"></a>什么是Svelte?</h2><p>首先, svelte是一个前端框架, 在国内使用人数非常少, 但是如果你到github上去看它的repo,你会发现居然有25.3k的star.<br>什么? 居然这么多? 为啥我没听过呢? 不是只有三大框架么? (问号脸?)<br>那今天就来给大家介绍一下它和我们熟悉的另外几个常见框架<code>react</code> <code>vue</code> 有什么区别?</p>
+<h2 id="Svelte有什么特点"><a href="#Svelte有什么特点" class="headerlink" title="Svelte有什么特点"></a>Svelte有什么特点</h2><p>让我们先看一下用<code>svelte</code>来书写组件是什么样子的:</p>
+<p>try.svelte<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">	<span class="keyword">let</span> count = <span class="number">0</span>;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="javascript">	<span class="function"><span class="keyword">function</span> <span class="title">handleClick</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="undefined">		count += 1;</span></span><br><span class="line"><span class="undefined">	&#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">on:click</span>=<span class="string">&#123;handleClick&#125;</span>&gt;</span></span><br><span class="line">	Clicked &#123;count&#125; &#123;count === 1 ? 'time' : 'times'&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>我们有一说一, 是不是有点像<code>vue</code>的写法? 看想去很像是<code>.vue</code>的文件嘛!? 但又好少点什么?</p>
+<p>没有错! 就是少了很多东西, 首先旧少了框架的引入, 也少了很多声明试的代码,如果让你用<code>vue</code> <code>react</code> 来写这个代码逻辑的话,<br>恐怕都没法写的这么精简把? 其实这就是<code>Svelte</code>框架对外宣称的第一个特点: ‘Write less code’, 整个代码几乎没有任何样板代码,<br>看上去十分清爽, 也刚容易理解</p>
+<p>实际上通常一个功能的代码量, <code>svelte</code>要比 <code>react</code>少不少:<br><img src="https://static001.infoq.cn/resource/image/e0/7f/e0bfee0f9437fc88a1a6928738af117f.jpg" alt="对比"></p>
+<p>让我们看看代码为什么这么少?我们发现代码在对变量更新的时候并没有使用类似<code>react</code>的<code>setState</code>方法, 而是直接对变量进行了再赋值.<br>仅仅是对变量进行了赋值就可以引发视图的变化, 很显然是数据响应的, 这就是<code>svelte</code>的第二个特点: ‘truly reactive’</p>
+<p>但是它又很奇怪,因为它像vue一样吧变量声明到一个对象中来进行数据劫持, 那到底是怎么做到的呢?</p>
+<p>让我们看看他编译以后的代码, 编译以后变成了这样…</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* App.svelte generated by Svelte v3.12.1 */</span></span><br><span class="line"><span class="keyword">import</span> &#123; SvelteComponent, append, detach, element, init,</span><br><span class="line">	insert, listen, noop, safe_not_equal, set_data, space, text</span><br><span class="line">&#125; <span class="keyword">from</span> <span class="string">"svelte/internal"</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">create_fragment</span>(<span class="params">ctx</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> button, t0, t1, t2, t3_value = ctx.count === <span class="number">1</span> ? <span class="string">'time'</span> : <span class="string">'times'</span> + <span class="string">""</span>, t3, dispose;</span><br><span class="line">	<span class="keyword">return</span> &#123;</span><br><span class="line">		c() &#123;</span><br><span class="line">			button = element(<span class="string">"button"</span>); <span class="comment">// 创建一个button</span></span><br><span class="line">			t0 = text(<span class="string">"Clicked "</span>);  </span><br><span class="line">			t1 = text(ctx.count); <span class="comment">// 变量count 的textnode</span></span><br><span class="line">			t2 = space(); <span class="comment">// 空格?</span></span><br><span class="line">			t3 = text(t3_value); <span class="comment">// 之前的三元表达式的结果 的 textnode</span></span><br><span class="line">			dispose = listen(button, <span class="string">"click"</span>, ctx.handleClick); <span class="comment">// 给button元素添加点击时间</span></span><br><span class="line">		&#125;,</span><br><span class="line">		m(target, anchor) &#123;</span><br><span class="line">			insert(target, button, anchor); <span class="comment">// 插入到目标元素</span></span><br><span class="line">			append(button, t0); <span class="comment">//  把文本添加到button上</span></span><br><span class="line">			append(button, t1);</span><br><span class="line">			append(button, t2);</span><br><span class="line">			append(button, t3);</span><br><span class="line">		&#125;,</span><br><span class="line">		p(changed, ctx) &#123;  <span class="comment">// 数据到dom的操作函数, 这里直接改document上的对应元素了!</span></span><br><span class="line">			<span class="keyword">if</span> (changed.count) &#123; set_data(t1, ctx.count); &#125; <span class="comment">// 更新 count textnode</span></span><br><span class="line">			<span class="keyword">if</span> ((changed.count) &amp;&amp; t3_value !== (t3_value = ctx.count === <span class="number">1</span> ? <span class="string">'time'</span> : <span class="string">'times'</span> + <span class="string">""</span>)) &#123;</span><br><span class="line">				set_data(t3, t3_value); <span class="comment">// 更新三元表达式的 textnode</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;,</span><br><span class="line">		i: noop, <span class="attr">o</span>: noop,</span><br><span class="line">		d(detaching) &#123; <span class="comment">// 销毁组件</span></span><br><span class="line">			<span class="keyword">if</span> (detaching) &#123; detach(button); &#125;</span><br><span class="line">			dispose();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">instance</span>(<span class="params">$$self, $$props, $$invalidate</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">let</span> count = <span class="number">0</span>; <span class="comment">// 真正的变量声明初始化</span></span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">handleClick</span>(<span class="params"></span>) </span>&#123;  <span class="comment">// click回调 初始化</span></span><br><span class="line">		$$invalidate(<span class="string">'count'</span>, count += <span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> &#123; count, handleClick &#125;;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 组件的构造函数</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">App</span> <span class="keyword">extends</span> <span class="title">SvelteComponent</span> </span>&#123;</span><br><span class="line">	<span class="keyword">constructor</span>(options) &#123;</span><br><span class="line">		<span class="keyword">super</span>();</span><br><span class="line">		init(<span class="keyword">this</span>, options, instance, create_fragment, safe_not_equal, []);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> App;</span><br></pre></td></tr></table></figure>
+<p>what? 没法看了,对不对? 让我们回过头仔细看看代码…</p>
+<p>看完注释, 是不是大概搞明白了. 这不就是jQuery么!</p>
+<p>没错, 大概意思差不多, 其实把<code>svelte</code>称作一个前端框架是不恰当的, 他更应该被称作编译器, 把开头的<code>.svelet</code>文件编译成上面的可执行代码.<br>而且编译后的代码中调用的大多数方法都是一些helper function, 所以<code>svelte</code>的runtime代码量是非常少的,它主要的工作都是在编译期完成的.</p>
+<p>并且我们发现,数据和视图的绑定,使用的是vanillaJs, 数据的变动,直接修改对应的dom节点,也就是说,他并没有用<code>virtual dom</code>!<br>这就是<code>svelte</code>的第三个卖点: ‘no virtual dom’. 显然我们不需要猜测也知道, 他的性能会很好.</p>
+<blockquote>
+<p>虚拟DOM不是一种功能。而是一种声明性的，状态驱动的UI开发,的最终手段.因为它使你无需考虑状态转换即可构建应用程序，并且性能通常足够好。这意味着更少的错误代码，而将更多的时间花费构建功能上，而不是乏味的工作上. 但是事实证明，我们无需使用虚拟DOM就可以实现类似的编程模型-这就是Svelte的用武之地。</p>
+</blockquote>
+<p>实际上最后, <code>svelte</code>编译好的代码是不再需要任何依赖的,是一个天然的组件, 只要把导出的类直接实例化, 组件就被正确的添加了<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> el = <span class="keyword">new</span> App(&#123;</span><br><span class="line">  target: <span class="built_in">document</span>.body,</span><br><span class="line">  props: &#123;&#125;,</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>所以<code>svelte</code>很容易被嵌入到其他框架中去使用</p>
+<h2 id="svelte潜在的问题"><a href="#svelte潜在的问题" class="headerlink" title="svelte潜在的问题"></a>svelte潜在的问题</h2><ul>
+<li>虽然它只有很少的运行时代码,但他构建后的代码,有可能比用<code>virtual dom</code>构建的代码多,并且有很多运行时代码的重复调用. 随着项目的扩大,运行时代码的体量优势也会越来越小, 最终实际生产项目中能有多少尺寸的优势很难说</li>
+<li>虽然编译后的代码性能几乎和 vanillaJs持平, 现在主流框架的virtual dom 也可以做到只比vanillaJs慢1.5倍左右, 这也证明了为了web页面的性能的瓶颈很可能不在dom本身,而在框架</li>
+<li>svelte的这种实现逻辑导致它无法被像<code>virtual dom</code>这样, 容易静态分析,继而移植为服务端渲染, 也很难基于vNode进行测试</li>
+</ul>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>不论如何,不得不说, 作者在整个框架思路上,非常的清奇,与众不同. 看完让我眼前一亮. 果然<code>virtual dom</code> 并不一定是前端的的最佳实践 前端还会有很多路要走, 我们也有很多代码值得去看.<br>最后提一句, 作者操作这么秀, 一定不是普通人,对吧? 他就是前端轮子哥, 也是<code>rollup</code>的作者 Rich-Harris. <a href="https://github.com/Rich-Harris" target="_blank" rel="noopener">这是他的github</a></p>
+<h2 id="推荐阅读"><a href="#推荐阅读" class="headerlink" title="推荐阅读"></a>推荐阅读</h2><p><a href="https://svelte.dev" target="_blank" rel="noopener">svelte 官网</a><br><a href="https://blog.logrocket.com/truly-reactive-programming-with-svelte-3-0-321b49b75969/" target="_blank" rel="noopener">Truly reactive programming with Svelte 3.0</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/10/25/初始Svelte/" data-id="ck25rf4sy0003skro4ysh2wa2" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2019/08/29/10分钟上手ast/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">10分钟上手ast</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/10/25/初始Svelte/">初始Svelte</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/29/10分钟上手ast/">10分钟上手ast</a>
+          </li>
+        
+          <li>
+            <a href="/2019/05/16/react-router4学习(1)/">react-router4学习</a>
+          </li>
+        
+          <li>
+            <a href="/2019/05/09/2019学习计划/">2019学习计划</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

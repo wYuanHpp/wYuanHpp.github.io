@@ -62,6 +62,68 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-初始Svelte" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/10/25/初始Svelte/" class="article-date">
+  <time datetime="2019-10-25T06:32:25.000Z" itemprop="datePublished">2019-10-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/10/25/初始Svelte/">初始Svelte</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="初识-Svelte"><a href="#初识-Svelte" class="headerlink" title="初识 Svelte"></a>初识 Svelte</h1><h2 id="什么是Svelte"><a href="#什么是Svelte" class="headerlink" title="什么是Svelte?"></a>什么是Svelte?</h2><p>首先, svelte是一个前端框架, 在国内使用人数非常少, 但是如果你到github上去看它的repo,你会发现居然有25.3k的star.<br>什么? 居然这么多? 为啥我没听过呢? 不是只有三大框架么? (问号脸?)<br>那今天就来给大家介绍一下它和我们熟悉的另外几个常见框架<code>react</code> <code>vue</code> 有什么区别?</p>
+<h2 id="Svelte有什么特点"><a href="#Svelte有什么特点" class="headerlink" title="Svelte有什么特点"></a>Svelte有什么特点</h2><p>让我们先看一下用<code>svelte</code>来书写组件是什么样子的:</p>
+<p>try.svelte<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">	<span class="keyword">let</span> count = <span class="number">0</span>;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="javascript">	<span class="function"><span class="keyword">function</span> <span class="title">handleClick</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="undefined">		count += 1;</span></span><br><span class="line"><span class="undefined">	&#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">on:click</span>=<span class="string">&#123;handleClick&#125;</span>&gt;</span></span><br><span class="line">	Clicked &#123;count&#125; &#123;count === 1 ? 'time' : 'times'&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>我们有一说一, 是不是有点像<code>vue</code>的写法? 看想去很像是<code>.vue</code>的文件嘛!? 但又好少点什么?</p>
+<p>没有错! 就是少了很多东西, 首先旧少了框架的引入, 也少了很多声明试的代码,如果让你用<code>vue</code> <code>react</code> 来写这个代码逻辑的话,<br>恐怕都没法写的这么精简把? 其实这就是<code>Svelte</code>框架对外宣称的第一个特点: ‘Write less code’, 整个代码几乎没有任何样板代码,<br>看上去十分清爽, 也刚容易理解</p>
+<p>实际上通常一个功能的代码量, <code>svelte</code>要比 <code>react</code>少不少:<br><img src="https://static001.infoq.cn/resource/image/e0/7f/e0bfee0f9437fc88a1a6928738af117f.jpg" alt="对比"></p>
+<p>让我们看看代码为什么这么少?我们发现代码在对变量更新的时候并没有使用类似<code>react</code>的<code>setState</code>方法, 而是直接对变量进行了再赋值.<br>仅仅是对变量进行了赋值就可以引发视图的变化, 很显然是数据响应的, 这就是<code>svelte</code>的第二个特点: ‘truly reactive’</p>
+<p>但是它又很奇怪,因为它像vue一样吧变量声明到一个对象中来进行数据劫持, 那到底是怎么做到的呢?</p>
+<p>让我们看看他编译以后的代码, 编译以后变成了这样…</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* App.svelte generated by Svelte v3.12.1 */</span></span><br><span class="line"><span class="keyword">import</span> &#123; SvelteComponent, append, detach, element, init,</span><br><span class="line">	insert, listen, noop, safe_not_equal, set_data, space, text</span><br><span class="line">&#125; <span class="keyword">from</span> <span class="string">"svelte/internal"</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">create_fragment</span>(<span class="params">ctx</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> button, t0, t1, t2, t3_value = ctx.count === <span class="number">1</span> ? <span class="string">'time'</span> : <span class="string">'times'</span> + <span class="string">""</span>, t3, dispose;</span><br><span class="line">	<span class="keyword">return</span> &#123;</span><br><span class="line">		c() &#123;</span><br><span class="line">			button = element(<span class="string">"button"</span>); <span class="comment">// 创建一个button</span></span><br><span class="line">			t0 = text(<span class="string">"Clicked "</span>);  </span><br><span class="line">			t1 = text(ctx.count); <span class="comment">// 变量count 的textnode</span></span><br><span class="line">			t2 = space(); <span class="comment">// 空格?</span></span><br><span class="line">			t3 = text(t3_value); <span class="comment">// 之前的三元表达式的结果 的 textnode</span></span><br><span class="line">			dispose = listen(button, <span class="string">"click"</span>, ctx.handleClick); <span class="comment">// 给button元素添加点击时间</span></span><br><span class="line">		&#125;,</span><br><span class="line">		m(target, anchor) &#123;</span><br><span class="line">			insert(target, button, anchor); <span class="comment">// 插入到目标元素</span></span><br><span class="line">			append(button, t0); <span class="comment">//  把文本添加到button上</span></span><br><span class="line">			append(button, t1);</span><br><span class="line">			append(button, t2);</span><br><span class="line">			append(button, t3);</span><br><span class="line">		&#125;,</span><br><span class="line">		p(changed, ctx) &#123;  <span class="comment">// 数据到dom的操作函数, 这里直接改document上的对应元素了!</span></span><br><span class="line">			<span class="keyword">if</span> (changed.count) &#123; set_data(t1, ctx.count); &#125; <span class="comment">// 更新 count textnode</span></span><br><span class="line">			<span class="keyword">if</span> ((changed.count) &amp;&amp; t3_value !== (t3_value = ctx.count === <span class="number">1</span> ? <span class="string">'time'</span> : <span class="string">'times'</span> + <span class="string">""</span>)) &#123;</span><br><span class="line">				set_data(t3, t3_value); <span class="comment">// 更新三元表达式的 textnode</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;,</span><br><span class="line">		i: noop, <span class="attr">o</span>: noop,</span><br><span class="line">		d(detaching) &#123; <span class="comment">// 销毁组件</span></span><br><span class="line">			<span class="keyword">if</span> (detaching) &#123; detach(button); &#125;</span><br><span class="line">			dispose();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">instance</span>(<span class="params">$$self, $$props, $$invalidate</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">let</span> count = <span class="number">0</span>; <span class="comment">// 真正的变量声明初始化</span></span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">handleClick</span>(<span class="params"></span>) </span>&#123;  <span class="comment">// click回调 初始化</span></span><br><span class="line">		$$invalidate(<span class="string">'count'</span>, count += <span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> &#123; count, handleClick &#125;;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 组件的构造函数</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">App</span> <span class="keyword">extends</span> <span class="title">SvelteComponent</span> </span>&#123;</span><br><span class="line">	<span class="keyword">constructor</span>(options) &#123;</span><br><span class="line">		<span class="keyword">super</span>();</span><br><span class="line">		init(<span class="keyword">this</span>, options, instance, create_fragment, safe_not_equal, []);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> App;</span><br></pre></td></tr></table></figure>
+<p>what? 没法看了,对不对? 让我们回过头仔细看看代码…</p>
+<p>看完注释, 是不是大概搞明白了. 这不就是jQuery么!</p>
+<p>没错, 大概意思差不多, 其实把<code>svelte</code>称作一个前端框架是不恰当的, 他更应该被称作编译器, 把开头的<code>.svelet</code>文件编译成上面的可执行代码.<br>而且编译后的代码中调用的大多数方法都是一些helper function, 所以<code>svelte</code>的runtime代码量是非常少的,它主要的工作都是在编译期完成的.</p>
+<p>并且我们发现,数据和视图的绑定,使用的是vanillaJs, 数据的变动,直接修改对应的dom节点,也就是说,他并没有用<code>virtual dom</code>!<br>这就是<code>svelte</code>的第三个卖点: ‘no virtual dom’. 显然我们不需要猜测也知道, 他的性能会很好.</p>
+<blockquote>
+<p>虚拟DOM不是一种功能。而是一种声明性的，状态驱动的UI开发,的最终手段.因为它使你无需考虑状态转换即可构建应用程序，并且性能通常足够好。这意味着更少的错误代码，而将更多的时间花费构建功能上，而不是乏味的工作上. 但是事实证明，我们无需使用虚拟DOM就可以实现类似的编程模型-这就是Svelte的用武之地。</p>
+</blockquote>
+<p>实际上最后, <code>svelte</code>编译好的代码是不再需要任何依赖的,是一个天然的组件, 只要把导出的类直接实例化, 组件就被正确的添加了<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> el = <span class="keyword">new</span> App(&#123;</span><br><span class="line">  target: <span class="built_in">document</span>.body,</span><br><span class="line">  props: &#123;&#125;,</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>所以<code>svelte</code>很容易被嵌入到其他框架中去使用</p>
+<h2 id="svelte潜在的问题"><a href="#svelte潜在的问题" class="headerlink" title="svelte潜在的问题"></a>svelte潜在的问题</h2><ul>
+<li>虽然它只有很少的运行时代码,但他构建后的代码,有可能比用<code>virtual dom</code>构建的代码多,并且有很多运行时代码的重复调用. 随着项目的扩大,运行时代码的体量优势也会越来越小, 最终实际生产项目中能有多少尺寸的优势很难说</li>
+<li>虽然编译后的代码性能几乎和 vanillaJs持平, 现在主流框架的virtual dom 也可以做到只比vanillaJs慢1.5倍左右, 这也证明了为了web页面的性能的瓶颈很可能不在dom本身,而在框架</li>
+<li>svelte的这种实现逻辑导致它无法被像<code>virtual dom</code>这样, 容易静态分析,继而移植为服务端渲染, 也很难基于vNode进行测试</li>
+</ul>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>不论如何,不得不说, 作者在整个框架思路上,非常的清奇,与众不同. 看完让我眼前一亮. 果然<code>virtual dom</code> 并不一定是前端的的最佳实践 前端还会有很多路要走, 我们也有很多代码值得去看.<br>最后提一句, 作者操作这么秀, 一定不是普通人,对吧? 他就是前端轮子哥, 也是<code>rollup</code>的作者 Rich-Harris. <a href="https://github.com/Rich-Harris" target="_blank" rel="noopener">这是他的github</a></p>
+<h2 id="推荐阅读"><a href="#推荐阅读" class="headerlink" title="推荐阅读"></a>推荐阅读</h2><p><a href="https://svelte.dev" target="_blank" rel="noopener">svelte 官网</a><br><a href="https://blog.logrocket.com/truly-reactive-programming-with-svelte-3-0-321b49b75969/" target="_blank" rel="noopener">Truly reactive programming with Svelte 3.0</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/10/25/初始Svelte/" data-id="ck25rf4sy0003skro4ysh2wa2" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-10分钟上手ast" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/08/29/10分钟上手ast/" class="article-date">
@@ -84,28 +146,49 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="什么是AST"><a href="#什么是AST" class="headerlink" title="什么是AST"></a>什么是AST</h2><p> AST(Abstract Syntax Tree)简称是抽象语法树,是源代码语法结构的一种抽象表示.它以树状的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构.<br> 比如一下代码:<br> <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="number">1</span> = <span class="number">5</span>;</span><br></pre></td></tr></table></figure></p>
+        <h2 id="什么是AST"><a href="#什么是AST" class="headerlink" title="什么是AST"></a>什么是AST</h2><p>AST(Abstract Syntax Tree)简称是抽象语法树,是源代码语法结构的一种抽象表示.它以树状的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构.<br> AST(Abstract Syntax Tree)简称是抽象语法树,是源代码语法结构的一种抽象表示.它以树状的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构.<br>AST(Abstract Syntax Tree)简称是抽象语法树,是源代码语法结构的一种抽象表示.它以树状的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构.<br>在现在的前端工程中, 有大量工具都在使用ast,比如 <code>eslint</code> <code>webpack</code> <code>uglify</code>等.</p>
+<p>那么ast到底长什么样子?</p>
+<p> 比如一下代码:<br> <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> a = <span class="number">5</span>;</span><br></pre></td></tr></table></figure></p>
 <p> 这行代码大致会被解析为以下ast<br> <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"type"</span>: <span class="string">"VariableDeclaration"</span>,</span><br><span class="line">  <span class="attr">"declarations"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"type"</span>: <span class="string">"VariableDeclarator"</span>,</span><br><span class="line">      <span class="attr">"id"</span>: &#123;</span><br><span class="line">        <span class="attr">"type"</span>: <span class="string">"Identifier"</span>,</span><br><span class="line">        <span class="attr">"name"</span>: <span class="string">"a"</span></span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">"init"</span>: &#123;</span><br><span class="line">        <span class="attr">"type"</span>: <span class="string">"NumericLiteral"</span>,</span><br><span class="line">        <span class="attr">"value"</span>: <span class="number">5</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  <span class="attr">"kind"</span>: <span class="string">"const"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>这里推荐一个工具 <a href="https://astexplorer.net/" target="_blank" rel="noopener">ast explorer</a>, 它可以帮你快速把代码转换成ast, 提高你的开发效率</p>
-<p> 可以看出来, 代码变成了一个树结构的数组对象, 描述了一个对一个变量的赋值. 那么我们能用ast来做点什么呢?</p>
+<p> 可以看出来, 代码变成了一个树结构, 描述了一个变量的赋值. 那么我们能用ast来做点什么呢?</p>
 <h2 id="重新认识babel"><a href="#重新认识babel" class="headerlink" title="重新认识babel"></a>重新认识babel</h2><p> 社区里, 能够解析js代码到ast的工具有很多, 这里我们就使用大家都比较熟悉的babel来举例</p>
-<p> <code>babel</code>是一个js编译器,能够把es6等语法编译成es5, 并且他还提供了丰富的工具,可以让我们做很多我们想干的事情.比如:<br> <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; Button &#125; <span class="keyword">from</span> <span class="string">'element'</span></span><br></pre></td></tr></table></figure></p>
-<p> 转化成:<br> <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Button <span class="keyword">from</span> <span class="string">'element/lib/Button'</span></span><br></pre></td></tr></table></figure></p>
+<p>babel的执行过程通常分为 parse transfer generate 三个部分</p>
+<p> <code>babel</code>是一个js编译器,能够把es6等语法编译成es5, 并且他还提供了丰富的工具,可以让我们做很多我们想干的事情.比如:</p>
+ <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; Button &#125; <span class="keyword">from</span> <span class="string">'element'</span></span><br></pre></td></tr></table></figure>
+<p> 转化成:<br> <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; Button &#125; <span class="keyword">from</span> <span class="string">'element/es'</span></span><br></pre></td></tr></table></figure></p>
 <p>如果想完成这样的事情,我们需要大概了解一下babel的工具包  </p>
 <ol>
 <li><code>@babel/parser</code>用来把js代码转换成ast</li>
 <li><code>@babel/traverse</code>用来帮助你遍历ast</li>
 <li><code>@babel/types</code> 用来帮助你判断ast节点,或生成相应的节点</li>
-<li><code>@babel/generator</code> 用来把ast从新转换成js代码</li>
 </ol>
 <h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><p>让我们想一下, 如果要把代码a转变成代码b, 应该是一个什么思路?我的思路是:</p>
 <ol>
 <li>先吧js转换成ast</li>
-<li>遍历ast收集信息</li>
-<li>更具收集的信息生成ast</li>
-<li>把新生城的ast转换为js代码并输出</li>
+<li>遍历ast</li>
+<li>修改需要调整的节点</li>
+<li>把修改过后的ast转换为js代码并输出</li>
 </ol>
-<h3 id="第一步-转换ast"><a href="#第一步-转换ast" class="headerlink" title="第一步,转换ast"></a>第一步,转换ast</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; parse &#125; <span class="keyword">from</span> <span class="string">'@babel/parser'</span>;</span><br><span class="line"><span class="keyword">import</span> traverse <span class="keyword">from</span> <span class="string">"@babel/traverse"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> code = <span class="string">"import &#123; Button &#125; from 'element'"</span>;</span><br><span class="line"><span class="comment">// 生成传入code的ast</span></span><br><span class="line"><span class="keyword">const</span> ast = parse(code);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> names = [];</span><br><span class="line">traverse(ast, &#123;</span><br><span class="line">    ImportDeclaration: <span class="function"><span class="keyword">function</span>(<span class="params">path</span>) </span>&#123;  <span class="comment">// 只处理import语句</span></span><br><span class="line">      <span class="keyword">const</span> sourceValue = path.node.source.value;</span><br><span class="line">      <span class="keyword">if</span> (sourceValue === <span class="string">'element'</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (types.isImportSpecifier(specifier)) &#123;  <span class="comment">// 只处理解构方式声明的变量明</span></span><br><span class="line">          <span class="comment">// 拿到所有结构的变量名</span></span><br><span class="line">          names.push(specifier.local.name);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">//根据收集到的解构变量名list,生成新的ast</span></span><br><span class="line"><span class="keyword">const</span> body = names.map(<span class="function">(<span class="params">name</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> source = types.stringLiteral(<span class="string">`element/lib/<span class="subst">$&#123;name&#125;</span>`</span>); <span class="comment">// 生成source节点</span></span><br><span class="line">  <span class="keyword">const</span> specifier = types.importDefaultSpecifier(types.identifier(name)); <span class="comment">// 生成 specifier节点</span></span><br><span class="line">  <span class="keyword">return</span> types.ImportDeclaration([specifier], source);  <span class="comment">// 生成Import声明节点</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在外面包了一层program节点, 生成完整的树</span></span><br><span class="line"><span class="keyword">const</span> convertedAst = types.program(body, [], <span class="string">'module'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 把ast转换成js代码并输出</span></span><br><span class="line"><span class="keyword">const</span> convertCode = generator(convertedAst).code;</span><br><span class="line"><span class="keyword">return</span> convertCode; <span class="comment">// import Button from 'element/lib/Button'</span></span><br></pre></td></tr></table></figure>
+<h3 id="第一步-转换源码到ast"><a href="#第一步-转换源码到ast" class="headerlink" title="第一步,转换源码到ast"></a>第一步,转换源码到ast</h3><p>babel的<code>@babel/parser</code> 是用的他们自己开发的 <code>babylon</code>来实现的, 而<code>babylon</code> 是fork的’acorn’, 而<code>acorn</code>号称是最快并且最小的js ast parser<br>目前社区还有各种ast parser实现:</p>
+<ul>
+<li>uglifyjs</li>
+<li>esprima</li>
+<li>acorn</li>
+<li>babylon<br>等等</li>
+</ul>
+<p>他们基本上都是按照 Mozilla 的<a href="https://github.com/estree/estree" target="_blank" rel="noopener">The ESTree Spec</a>来实现的, 对ast的各种node有兴趣的同学可以好好看看</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; parse &#125; <span class="keyword">from</span> <span class="string">'@babel/parser'</span>;</span><br><span class="line"><span class="keyword">import</span> traverse <span class="keyword">from</span> <span class="string">"@babel/traverse"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> code = <span class="string">"import &#123; Button &#125; from 'element'"</span>;</span><br><span class="line"><span class="comment">// 生成传入code的ast</span></span><br><span class="line"><span class="keyword">const</span> ast = parse(code);</span><br></pre></td></tr></table></figure>
+<h3 id="遍历ast的对应节点"><a href="#遍历ast的对应节点" class="headerlink" title="遍历ast的对应节点"></a>遍历ast的对应节点</h3><p>在获取ast之后, 需要的就是遍历我们需要处理的节点, 收集import导出的变量和对应的source,这里会用到<code>@babel/traverse</code>用来帮助你遍历ast  </p>
+<p>可以通过<code>enter</code> 或者是<code>exit</code> 访问到节点, <code>enter</code>是在进入节点时调用, <code>exit</code>是在离开节点时调用<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">traverse(ast, &#123;</span><br><span class="line">  enter(path) &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;,</span><br><span class="line">  exit(path) &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>如果不需要遍历所有节点, 可以只设置特定节点进行访问</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">traverse(ast, &#123;</span><br><span class="line">  FunctionDeclaration: <span class="function"><span class="keyword">function</span>(<span class="params">path</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>对节点的访问过程中,通常我们需要去判断节点的类型, 这个是有就会用到我们的<code>babel@type</code>, 他提供了相关的断言函数来判断传入的节点是否是你要访问的节点,<br>并且也有相关的工具函数来生成对应的节点, 下面我们看看具体怎么用吧!</p>
+<p>在这一步,首先我们需要找到我们需要调整的的import节点, 之后对import的source进行修改:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> names = [];</span><br><span class="line">traverse(ast, &#123;</span><br><span class="line">    ImportDeclaration: <span class="function"><span class="keyword">function</span>(<span class="params">path</span>) </span>&#123;  <span class="comment">// 只处理import语句</span></span><br><span class="line">      <span class="keyword">const</span> sourceValue = path.node.source.value;</span><br><span class="line">      <span class="keyword">if</span> (sourceValue === <span class="string">'element'</span>) &#123;</span><br><span class="line">        path.node.source = types.stringLiteral(<span class="string">`<span class="subst">$&#123;sourceValue&#125;</span>/es`</span>)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="还原代码"><a href="#还原代码" class="headerlink" title="还原代码"></a>还原代码</h3><p>最后一步也是最简单的一步, 把ast还原成代码</p>
+<p>这里用到了<code>babel@generator</code>, 这个工具是用来把传入的ast转换为源码的,也可以导出源码的sourceMap</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 把ast转换成js代码并输出</span></span><br><span class="line"><span class="keyword">const</span> convertCode = generator(ast).code;</span><br><span class="line"><span class="keyword">return</span> convertCode; <span class="comment">// import &#123; Button &#125; from 'element/es'</span></span><br></pre></td></tr></table></figure>
 <p>以上就是这个简单小功能的用法, 可以发现其实就是按部就班的来,类似于把大象放进冰箱的思路</p>
 <p>其实在生成js代码的时候也可以用<code>@babel/template</code>来做, 也可能会更方便, 相关的工具api可以再babel的主页上查找</p>
 <p>也许这个babel的小栗子可以为你打开一扇门, 让你能够知道, 其实你可以做的更多</p>
@@ -113,7 +196,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/08/29/10分钟上手ast/" data-id="cjzxnjyha0000khrowic1jet3" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/08/29/10分钟上手ast/" data-id="ck25rf4sr0000skro97i7x8dg" class="article-share-link">Share</a>
       
       
     </footer>
@@ -159,7 +242,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/16/react-router4学习(1)/" data-id="cjzxnjyhf0002khroz40ts094" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/16/react-router4学习(1)/" data-id="ck25rf4sx0002skrowa4qaz7b" class="article-share-link">Share</a>
       
       
     </footer>
@@ -202,7 +285,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/09/2019学习计划/" data-id="cjzxnjyhe0001khrosvidkqhn" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/09/2019学习计划/" data-id="ck25rf4sv0001skrof6lp2i8f" class="article-share-link">Share</a>
       
       
     </footer>
@@ -230,7 +313,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
     </div>
   </div>
 
@@ -241,6 +324,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/10/25/初始Svelte/">初始Svelte</a>
+          </li>
         
           <li>
             <a href="/2019/08/29/10分钟上手ast/">10分钟上手ast</a>
