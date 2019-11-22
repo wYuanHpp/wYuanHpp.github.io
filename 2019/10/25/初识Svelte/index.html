@@ -7,18 +7,18 @@
   
   <title>初识Svelte | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="初识 Svelte什么是Svelte?首先, svelte是一个前端框架, 在国内使用人数非常少, 但是如果你到github上去看它的repo,你会发现居然有25.3k的star.什么? 居然这么多? 为啥我没听过呢? 不是只有三大框架么? (问号脸?)那今天就来给大家介绍一下它和我们熟悉的另外几个常见框架react vue 有什么区别? Svelte有什么特点让我们先看一下用svelte来书写组">
+  <meta name="description" content="什么是Svelte?首先, svelte是一个前端框架, 在国内使用人数非常少, 但是如果你到github上去看它的repo,你会发现居然有25.3k的star.什么? 居然这么多? 为啥我没听过呢? 不是只有三大框架么? (问号脸?)那今天就来给大家介绍一下它和我们熟悉的另外几个常见框架react vue 有什么区别? Svelte有什么特点让我们先看一下用svelte来书写组件是什么样子的:">
 <meta property="og:type" content="article">
 <meta property="og:title" content="初识Svelte">
 <meta property="og:url" content="http://yoursite.com/2019/10/25/初识Svelte/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="初识 Svelte什么是Svelte?首先, svelte是一个前端框架, 在国内使用人数非常少, 但是如果你到github上去看它的repo,你会发现居然有25.3k的star.什么? 居然这么多? 为啥我没听过呢? 不是只有三大框架么? (问号脸?)那今天就来给大家介绍一下它和我们熟悉的另外几个常见框架react vue 有什么区别? Svelte有什么特点让我们先看一下用svelte来书写组">
+<meta property="og:description" content="什么是Svelte?首先, svelte是一个前端框架, 在国内使用人数非常少, 但是如果你到github上去看它的repo,你会发现居然有25.3k的star.什么? 居然这么多? 为啥我没听过呢? 不是只有三大框架么? (问号脸?)那今天就来给大家介绍一下它和我们熟悉的另外几个常见框架react vue 有什么区别? Svelte有什么特点让我们先看一下用svelte来书写组件是什么样子的:">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="https://static001.infoq.cn/resource/image/e0/7f/e0bfee0f9437fc88a1a6928738af117f.jpg">
-<meta property="og:updated_time" content="2019-10-25T06:35:10.271Z">
+<meta property="og:updated_time" content="2019-10-25T06:39:51.048Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="初识Svelte">
-<meta name="twitter:description" content="初识 Svelte什么是Svelte?首先, svelte是一个前端框架, 在国内使用人数非常少, 但是如果你到github上去看它的repo,你会发现居然有25.3k的star.什么? 居然这么多? 为啥我没听过呢? 不是只有三大框架么? (问号脸?)那今天就来给大家介绍一下它和我们熟悉的另外几个常见框架react vue 有什么区别? Svelte有什么特点让我们先看一下用svelte来书写组">
+<meta name="twitter:description" content="什么是Svelte?首先, svelte是一个前端框架, 在国内使用人数非常少, 但是如果你到github上去看它的repo,你会发现居然有25.3k的star.什么? 居然这么多? 为啥我没听过呢? 不是只有三大框架么? (问号脸?)那今天就来给大家介绍一下它和我们熟悉的另外几个常见框架react vue 有什么区别? Svelte有什么特点让我们先看一下用svelte来书写组件是什么样子的:">
 <meta name="twitter:image" content="https://static001.infoq.cn/resource/image/e0/7f/e0bfee0f9437fc88a1a6928738af117f.jpg">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
@@ -88,7 +88,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="初识-Svelte"><a href="#初识-Svelte" class="headerlink" title="初识 Svelte"></a>初识 Svelte</h1><h2 id="什么是Svelte"><a href="#什么是Svelte" class="headerlink" title="什么是Svelte?"></a>什么是Svelte?</h2><p>首先, svelte是一个前端框架, 在国内使用人数非常少, 但是如果你到github上去看它的repo,你会发现居然有25.3k的star.<br>什么? 居然这么多? 为啥我没听过呢? 不是只有三大框架么? (问号脸?)<br>那今天就来给大家介绍一下它和我们熟悉的另外几个常见框架<code>react</code> <code>vue</code> 有什么区别?</p>
+        <h2 id="什么是Svelte"><a href="#什么是Svelte" class="headerlink" title="什么是Svelte?"></a>什么是Svelte?</h2><p>首先, svelte是一个前端框架, 在国内使用人数非常少, 但是如果你到github上去看它的repo,你会发现居然有25.3k的star.<br>什么? 居然这么多? 为啥我没听过呢? 不是只有三大框架么? (问号脸?)<br>那今天就来给大家介绍一下它和我们熟悉的另外几个常见框架<code>react</code> <code>vue</code> 有什么区别?</p>
 <h2 id="Svelte有什么特点"><a href="#Svelte有什么特点" class="headerlink" title="Svelte有什么特点"></a>Svelte有什么特点</h2><p>让我们先看一下用<code>svelte</code>来书写组件是什么样子的:</p>
 <p>try.svelte<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">	<span class="keyword">let</span> count = <span class="number">0</span>;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="javascript">	<span class="function"><span class="keyword">function</span> <span class="title">handleClick</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="undefined">		count += 1;</span></span><br><span class="line"><span class="undefined">	&#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">on:click</span>=<span class="string">&#123;handleClick&#125;</span>&gt;</span></span><br><span class="line">	Clicked &#123;count&#125; &#123;count === 1 ? 'time' : 'times'&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
 <p>我们有一说一, 是不是有点像<code>vue</code>的写法? 看想去很像是<code>.vue</code>的文件嘛!? 但又好少点什么?</p>
@@ -102,6 +102,7 @@
 <p>看完注释, 是不是大概搞明白了. 这不就是jQuery么!</p>
 <p>没错, 大概意思差不多, 其实把<code>svelte</code>称作一个前端框架是不恰当的, 他更应该被称作编译器, 把开头的<code>.svelet</code>文件编译成上面的可执行代码.<br>而且编译后的代码中调用的大多数方法都是一些helper function, 所以<code>svelte</code>的runtime代码量是非常少的,它主要的工作都是在编译期完成的.</p>
 <p>并且我们发现,数据和视图的绑定,使用的是vanillaJs, 数据的变动,直接修改对应的dom节点,也就是说,他并没有用<code>virtual dom</code>!<br>这就是<code>svelte</code>的第三个卖点: ‘no virtual dom’. 显然我们不需要猜测也知道, 他的性能会很好.</p>
+<p>作者在官网上说:</p>
 <blockquote>
 <p>虚拟DOM不是一种功能。而是一种声明性的，状态驱动的UI开发,的最终手段.因为它使你无需考虑状态转换即可构建应用程序，并且性能通常足够好。这意味着更少的错误代码，而将更多的时间花费构建功能上，而不是乏味的工作上. 但是事实证明，我们无需使用虚拟DOM就可以实现类似的编程模型-这就是Svelte的用武之地。</p>
 </blockquote>
@@ -118,7 +119,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/10/25/初识Svelte/" data-id="ck25rhmh80003wero4yhzzhmr" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/10/25/初识Svelte/" data-id="ck39ri89r0004zes6jc69rjw8" class="article-share-link">Share</a>
       
       
     </footer>
@@ -126,6 +127,15 @@
   
     
 <nav id="article-nav">
+  
+    <a href="/2019/11/22/前端N面-elm-lang/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          前端N面-elm-lang
+        
+      </div>
+    </a>
   
   
     <a href="/2019/08/29/10分钟上手ast/" id="article-nav-older" class="article-nav-link-wrap">
@@ -154,7 +164,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
     </div>
   </div>
 
@@ -165,6 +175,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/11/22/前端N面-elm-lang/">前端N面-elm-lang</a>
+          </li>
         
           <li>
             <a href="/2019/10/25/初识Svelte/">初识Svelte</a>

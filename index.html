@@ -62,6 +62,95 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-前端N面-elm-lang" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/11/22/前端N面-elm-lang/" class="article-date">
+  <time datetime="2019-11-22T06:25:07.000Z" itemprop="datePublished">2019-11-22</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/11/22/前端N面-elm-lang/">前端N面-elm-lang</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="elm是什么"><a href="#elm是什么" class="headerlink" title="elm是什么?"></a>elm是什么?</h2><p><del>他是一个著名的外卖平台</del></p>
+<p>elm是一门开发语言, 是一门函数式语言, 但是不同于其他函数式语言, 因为这门语言只聚焦在前端开发方面, 也就是说,最后它能够编译成javascript.<br>elm是一门很年轻的语言, Evan Czaplicki 再2012年才把它设计出来, 而且是在他的毕业设计上(大雾)…<br>但是尽管elm非常年轻, 但显然它再前端圈里也是有这举足轻重的地位的,至于为什么, 我们稍后再说</p>
+<h2 id="为什么我们需要了解elm"><a href="#为什么我们需要了解elm" class="headerlink" title="为什么我们需要了解elm"></a>为什么我们需要了解elm</h2><p>最近两年, 因为react 和redux 的函数式编程思想, 导致前端的函数式编程大热. 我们不谈函数式编程真正能给前端带来什么,仅仅说函数式编程作为一种完全不同编程范式,<br>再学习这种编程思想的同时, 一定能过扩宽我们的编程思路, 一些偏函数式的库的出发点和基石, 毕竟再js里函数也是一等公民<br>如今前端框架吸收函数式编程以及强类型语言优点的形势下, 甚至可能会开启我们对前端的重新认识</p>
+<h2 id="elm有什么特点"><a href="#elm有什么特点" class="headerlink" title="elm有什么特点?"></a>elm有什么特点?</h2><ul>
+<li>强类型 (static type)</li>
+<li>函数式语言 (fpr)</li>
+<li>一次编译, (处处运行?) No Runtime Exceptions</li>
+<li>数据不可变 (immutable) </li>
+<li>虚拟dom (Great Performance)</li>
+</ul>
+<h2 id="语法特点"><a href="#语法特点" class="headerlink" title="语法特点"></a>语法特点</h2><p>elm的语法是来源于haskell的,虽然不是haskell的方言, 但还是吸收了很多形式,一下不会完全展开,<br>直挑一些后面实例用的到的一些语法做介绍</p>
+<h3 id="list"><a href="#list" class="headerlink" title="list"></a>list</h3><p><code>list</code>和js里的<code>array</code>类似, 但是每一个值都必须是相同的类型<br><figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">a</span> = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>] <span class="comment">-- correct </span></span><br><span class="line"><span class="title">a</span> = [<span class="number">1</span>, <span class="string">"2"</span>, <span class="number">3</span>, <span class="number">4</span>] <span class="comment">-- wrong</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="Records"><a href="#Records" class="headerlink" title="Records"></a>Records</h3><p>Record 和js里的<code>Object</code>很像, 他的定义方法是:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">john</span> = &#123; first = <span class="string">"John"</span>, last = <span class="string">"Hobson"</span>, age = <span class="number">25</span> &#125;</span><br><span class="line"></span><br><span class="line">.last john // <span class="string">"Hobson"</span>  .last 是一个records访问器</span><br><span class="line"></span><br><span class="line"><span class="title">john</span>.last // <span class="string">"Hobson"</span> 直接访问last</span><br><span class="line"></span><br><span class="line">&#123;john | last = 'blabla' &#125; // &#123; first = "John", last = "blabla", age = 25 &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Function"><a href="#Function" class="headerlink" title="Function"></a>Function</h3><figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">add</span> : <span class="type">Int</span> -&gt; <span class="type">Int</span> -&gt; <span class="type">Int</span> // 类型定义</span><br><span class="line"><span class="title">add</span> a b = a + b // function add (a,b) &#123;return a + b&#125;</span><br><span class="line"><span class="title">add</span> <span class="number">1</span> <span class="number">2</span>  // <span class="number">3</span></span><br></pre></td></tr></table></figure>
+<p>这里就可以发现elm的函数式特点, 再我们定义一个函数的时候, 如果有多个参数, 参数和参数之间的定义使用<code>-&gt;</code>来分割的,<br>其实这也表名了这个函数是被科里化的,函数的执行可以被分解成以下两部</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">temp</span> = add <span class="number">1</span> // init -&gt; init</span><br><span class="line"><span class="title">temp</span> <span class="number">2</span> // <span class="number">3</span></span><br></pre></td></tr></table></figure>
+<p>再elm里所有的函数都是被科里化的, 科里化的好处? 打个比方<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">repeat(<span class="number">10</span>, <span class="string">'a'</span>) <span class="comment">// 'aaaaaaaaaa'</span></span><br><span class="line"><span class="comment">// 科里化后</span></span><br><span class="line">repeat(<span class="number">10</span>)(<span class="string">'a'</span>) <span class="comment">// 'aaaaaaaaaa'</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 没有科里化</span></span><br><span class="line">repeat10(str) &#123;</span><br><span class="line">  <span class="keyword">return</span> repeat(<span class="number">10</span>, str);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 科里化的</span></span><br><span class="line">repeat10 = repeat(<span class="number">10</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="pipeline"><a href="#pipeline" class="headerlink" title="pipeline"></a>pipeline</h3><p>因为是函数式语言, 会出现多层的函数嵌套,比如再js中<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">param</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> a = fa(param);</span><br><span class="line">  <span class="keyword">let</span> b = fb(a);</span><br><span class="line">  <span class="keyword">let</span> c = fc(c);</span><br><span class="line">  <span class="keyword">return</span> c</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// or</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">param</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> fc(fb(fa(param)));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>你也可以通过<code>lodash</code> 或者 <code>ramda</code> 这样的fp工具库来做链式调用, 这里就不一一展开, 感兴趣的可以看对应的文档</p>
+<p>而再elm里, 就有专门的语法来处理这种情况<br><figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">param</span> = </span><br><span class="line">  param</span><br><span class="line">    |&gt;fa</span><br><span class="line">    |&gt;fb</span><br><span class="line">    |&gt;fc</span><br></pre></td></tr></table></figure></p>
+<p>一个字, 优雅</p>
+<h3 id="type"><a href="#type" class="headerlink" title="type"></a>type</h3><p>elm是一个强类型语言, 所以显然我们需要对类型做定义, 这里重点讲一下elm里面的union type, 因为这是elm的重要核心</p>
+<p>####普通类型<br><figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">User</span> : <span class="type">String</span> </span><br><span class="line">User tom = 'tom'</span><br><span class="line"><span class="type">User</span> num = <span class="number">1</span> // error</span><br></pre></td></tr></table></figure></p>
+<p>####Union Type<br>Union type 用来表示一组可能tag集合,比如Hr, Admin 都是User的一个variants</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> <span class="type">User</span> = <span class="type">Hr</span> <span class="type">String</span> | <span class="type">Admin</span> <span class="type">String</span></span><br></pre></td></tr></table></figure>
+<p>而Union type 也可以被解构<br><figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">getUserLabel</span>: <span class="type">User</span> -&gt; <span class="type">String</span></span><br><span class="line"><span class="title">getUserLabel</span> user = </span><br><span class="line">  <span class="keyword">case</span> user <span class="keyword">of</span></span><br><span class="line">    <span class="type">Hr</span> name -&gt;</span><br><span class="line">      name</span><br><span class="line">    <span class="type">Admin</span> name -&gt;</span><br><span class="line">      role ++ name</span><br><span class="line"></span><br><span class="line">```elm</span><br><span class="line">注意`<span class="keyword">case</span> user <span class="keyword">of</span>`下面的代码, 是不是和js里的`switch`很像? 所以union <span class="keyword">type</span>很多情况都被当做是一种条件判断</span><br><span class="line"></span><br><span class="line">```elm</span><br><span class="line"><span class="keyword">type</span> <span class="type">User</span> = <span class="type">Guest</span> <span class="type">String</span> | <span class="type">Admin</span> <span class="type">String</span> <span class="type">Int</span> </span><br><span class="line"><span class="title">getWelcomeMessage</span>: <span class="type">User</span> -&gt; <span class="type">String</span></span><br><span class="line"><span class="title">getWelcomeMessage</span> user =</span><br><span class="line">  <span class="keyword">case</span> user <span class="keyword">of</span></span><br><span class="line">     <span class="type">Guest</span> _-&gt;</span><br><span class="line">      <span class="string">"guest login!"</span></span><br><span class="line">    <span class="type">Admin</span> _ _ -&gt;</span><br><span class="line">      <span class="string">"admin login! welcome back!"</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>ok, 学完上面的几个知识点, 我们开始看一个简单的示例,来了解一个elm程序是如何构成的吧!</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> Main <span class="keyword">exposing</span> (..)</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> Browser</span><br><span class="line"><span class="keyword">import</span> Html <span class="keyword">exposing</span> (<span class="type">Html</span>, button, div, text, span, input)</span><br><span class="line"><span class="keyword">import</span> Html.Events <span class="keyword">exposing</span> (onClick, onInput)</span><br><span class="line"></span><br><span class="line"><span class="comment">-- MAIN</span></span><br><span class="line"><span class="title">main</span> =</span><br><span class="line">  <span class="type">Browser</span>.sandbox &#123; init = init, update = update, view = view &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- MODEL</span></span><br><span class="line"><span class="keyword">type</span> <span class="keyword">alias</span> <span class="type">Model</span> =  &#123; count: <span class="type">Int</span> &#125; </span><br><span class="line"></span><br><span class="line"><span class="title">init</span> : <span class="type">Model</span></span><br><span class="line"><span class="title">init</span> = &#123; count = <span class="number">1</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- UPDATE</span></span><br><span class="line"><span class="keyword">type</span> <span class="type">Msg</span> = <span class="type">Increment</span> | <span class="type">Decrement</span> </span><br><span class="line"></span><br><span class="line"><span class="title">update</span> : <span class="type">Msg</span> -&gt; <span class="type">Model</span> -&gt; <span class="type">Model</span></span><br><span class="line"><span class="title">update</span> msg model =</span><br><span class="line">  <span class="keyword">case</span> msg <span class="keyword">of</span></span><br><span class="line">    <span class="type">Increment</span> -&gt;</span><br><span class="line">      &#123; model | count = model.count + <span class="number">1</span> &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">Decrement</span> -&gt;</span><br><span class="line">      &#123; model | count = model.count + <span class="number">1</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- VIEW</span></span><br><span class="line"><span class="title">view</span> : <span class="type">Model</span> -&gt; <span class="type">Html</span> <span class="type">Msg</span></span><br><span class="line"><span class="title">view</span> model =</span><br><span class="line">  div []</span><br><span class="line">    [ button [ onClick <span class="type">Decrement</span> ] [ text <span class="string">"-"</span> ]</span><br><span class="line">    , div [] [ text (<span class="type">String</span>.fromInt model.count) ]</span><br><span class="line">    , button [ onClick <span class="type">Increment</span> ] [ text <span class="string">"+"</span> ]</span><br><span class="line">    ]</span><br></pre></td></tr></table></figure>
+<p>这里<code>view</code>是一个函数,它使用当前的<code>model</code>l来渲染dom, 使用的是类似<code>jsx</code>的函数调用, 这是一个纯的标准的函数式组件</p>
+<p><code>update</code>函数接受 <code>Msg</code>, 根据不同variants来对model做更新, 这和redux的reducer是非常类似的, 不同的variants就类似于不同的<code>actionType</code><br>状态被一个纯函数来更新,并返回一个新的状态</p>
+<p><code>init</code>定义了当前的初识状态</p>
+<p>最后形成一个数据流 init -&gt; view -&gt; update -&gt; init 这样的一个单向数据流</p>
+<p>上面就是一个简单的例子, 能够很好的提现elm开发的理念, 和它的代码解构, 先看一下上面的几行注释,<br>能明显看出来, 代码把程序分成几个部分:</p>
+<ul>
+<li>数据 (model  the state of your application)</li>
+<li>视图 (view  a way to turn your state into HTML)</li>
+<li>更新 (update  a way to update your state based on messages)</li>
+</ul>
+<p>elm管这种结构叫做 <code>elm architecture</code>,<br><img src="https://guide.elm-lang.org/architecture/buttons.svg" alt="elm architecture"></p>
+<p>是不是很像redux的逻辑?实际上并不是elm借鉴了redux, 而是redux借鉴了elm! 同时也顺便激发了<code>dva</code></p>
+<blockquote>
+<p>I read about Elm before Redux but didn’t get it fully, later realized it was important influence. – Dan Abrawov</p>
+</blockquote>
+<blockquote>
+<p>Lightweight front-end framework based on redux, redux-saga and react-router. (Inspired by elm and choo) – Dva</p>
+</blockquote>
+<h3 id="Side-Effects"><a href="#Side-Effects" class="headerlink" title="Side Effects"></a>Side Effects</h3><p>刚才一直在说<code>elm</code>都是纯函数, 但是在实际开发中, 是不可能这么完美的, 我们有很多场景都是不纯粹的, 比如io, network, 和其他js代码交互 等等, <code>elm</code>使用<code>port</code>, 和他本身的rentime封装了这层逻辑,<br>这样隔离了这些有副作用的逻辑<br><img src="https://elmprogramming.com/images/chapter-5/5.5-side-effects/elm-runtime.svg" alt="img"></p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>实际上, 目前很少有人在再生产环境使用elm, 一方面是因为它的社区不够强大, 还有一方面是文档不够完善, 再有就是比较陡峭的学习成本, 往往让人望而生畏  </p>
+<p>不过如果真的要入手学习的话, 作者写的<a href="https://github.com/evancz/elm-todomvc" target="_blank" rel="noopener">TODOMVC</a>,看明白就很不错啦<br>如果你敢再生产环境使用, 那你是真正的勇士(其实还真有)</p>
+<h2 id="推荐阅读"><a href="#推荐阅读" class="headerlink" title="推荐阅读"></a>推荐阅读</h2><p>  <a href="https://elm-lang.org/" target="_blank" rel="noopener">elm官网</a>  </p>
+<p>  <a href="https://github.com/paldepind/functional-frontend-architecture" target="_blank" rel="noopener">functional-frontend-architecture, 如何用纯js撸一个elm architecture</a>  </p>
+<p>  <a href="https://elmprogramming.com/" target="_blank" rel="noopener">更详细的教程</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/11/22/前端N面-elm-lang/" data-id="ck39ri89j0003zes6yys54i04" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-初识Svelte" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/10/25/初识Svelte/" class="article-date">
@@ -84,7 +173,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="初识-Svelte"><a href="#初识-Svelte" class="headerlink" title="初识 Svelte"></a>初识 Svelte</h1><h2 id="什么是Svelte"><a href="#什么是Svelte" class="headerlink" title="什么是Svelte?"></a>什么是Svelte?</h2><p>首先, svelte是一个前端框架, 在国内使用人数非常少, 但是如果你到github上去看它的repo,你会发现居然有25.3k的star.<br>什么? 居然这么多? 为啥我没听过呢? 不是只有三大框架么? (问号脸?)<br>那今天就来给大家介绍一下它和我们熟悉的另外几个常见框架<code>react</code> <code>vue</code> 有什么区别?</p>
+        <h2 id="什么是Svelte"><a href="#什么是Svelte" class="headerlink" title="什么是Svelte?"></a>什么是Svelte?</h2><p>首先, svelte是一个前端框架, 在国内使用人数非常少, 但是如果你到github上去看它的repo,你会发现居然有25.3k的star.<br>什么? 居然这么多? 为啥我没听过呢? 不是只有三大框架么? (问号脸?)<br>那今天就来给大家介绍一下它和我们熟悉的另外几个常见框架<code>react</code> <code>vue</code> 有什么区别?</p>
 <h2 id="Svelte有什么特点"><a href="#Svelte有什么特点" class="headerlink" title="Svelte有什么特点"></a>Svelte有什么特点</h2><p>让我们先看一下用<code>svelte</code>来书写组件是什么样子的:</p>
 <p>try.svelte<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">	<span class="keyword">let</span> count = <span class="number">0</span>;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="javascript">	<span class="function"><span class="keyword">function</span> <span class="title">handleClick</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="undefined">		count += 1;</span></span><br><span class="line"><span class="undefined">	&#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">on:click</span>=<span class="string">&#123;handleClick&#125;</span>&gt;</span></span><br><span class="line">	Clicked &#123;count&#125; &#123;count === 1 ? 'time' : 'times'&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
 <p>我们有一说一, 是不是有点像<code>vue</code>的写法? 看想去很像是<code>.vue</code>的文件嘛!? 但又好少点什么?</p>
@@ -98,6 +187,7 @@
 <p>看完注释, 是不是大概搞明白了. 这不就是jQuery么!</p>
 <p>没错, 大概意思差不多, 其实把<code>svelte</code>称作一个前端框架是不恰当的, 他更应该被称作编译器, 把开头的<code>.svelet</code>文件编译成上面的可执行代码.<br>而且编译后的代码中调用的大多数方法都是一些helper function, 所以<code>svelte</code>的runtime代码量是非常少的,它主要的工作都是在编译期完成的.</p>
 <p>并且我们发现,数据和视图的绑定,使用的是vanillaJs, 数据的变动,直接修改对应的dom节点,也就是说,他并没有用<code>virtual dom</code>!<br>这就是<code>svelte</code>的第三个卖点: ‘no virtual dom’. 显然我们不需要猜测也知道, 他的性能会很好.</p>
+<p>作者在官网上说:</p>
 <blockquote>
 <p>虚拟DOM不是一种功能。而是一种声明性的，状态驱动的UI开发,的最终手段.因为它使你无需考虑状态转换即可构建应用程序，并且性能通常足够好。这意味着更少的错误代码，而将更多的时间花费构建功能上，而不是乏味的工作上. 但是事实证明，我们无需使用虚拟DOM就可以实现类似的编程模型-这就是Svelte的用武之地。</p>
 </blockquote>
@@ -114,7 +204,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/10/25/初识Svelte/" data-id="ck25rhmh80003wero4yhzzhmr" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/10/25/初识Svelte/" data-id="ck39ri89r0004zes6jc69rjw8" class="article-share-link">Share</a>
       
       
     </footer>
@@ -196,7 +286,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/08/29/10分钟上手ast/" data-id="ck25rhmh60002werobih8r11m" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/08/29/10分钟上手ast/" data-id="ck39ri8950001zes62ago4g7s" class="article-share-link">Share</a>
       
       
     </footer>
@@ -242,7 +332,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/16/react-router4学习(1)/" data-id="ck25rhmh10000weroljdlbjvv" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/16/react-router4学习(1)/" data-id="ck39ri8970002zes6derkn4ob" class="article-share-link">Share</a>
       
       
     </footer>
@@ -285,7 +375,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/09/2019学习计划/" data-id="ck25rhmh50001wero7ln35vc3" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/09/2019学习计划/" data-id="ck39ri8920000zes65k4rev3a" class="article-share-link">Share</a>
       
       
     </footer>
@@ -313,7 +403,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
     </div>
   </div>
 
@@ -324,6 +414,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/11/22/前端N面-elm-lang/">前端N面-elm-lang</a>
+          </li>
         
           <li>
             <a href="/2019/10/25/初识Svelte/">初识Svelte</a>
