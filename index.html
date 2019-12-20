@@ -62,6 +62,86 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-深入webpack-tapable篇" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/12/20/深入webpack-tapable篇/" class="article-date">
+  <time datetime="2019-12-20T04:23:10.000Z" itemprop="datePublished">2019-12-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/12/20/深入webpack-tapable篇/">深入webpack-tapable篇</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>打算写一些webpack相关的文章, 今天就先打个样</p>
+<h3 id="引子"><a href="#引子" class="headerlink" title="引子"></a>引子</h3><p>说到webpack, 都知道是一个打包工具, 从一个入口开始, 遍历所有依赖, 并把所有文件都打包成一个js文件, webpack在整个构建过程中需要做一系列的工作, 那么它对这些复杂的工作是怎么组织的呢?<br>当我们去看webpack源码的时候, 会发现webpack在初始化的时候调用了大量的没用过的plugin来给compiler提供各种能力, 让人眼花缭乱的plugin,就这么一个个的挂载到compiler里面, 完全看不懂到底干了点啥子, 所以让我们先看看plugin到底是个啥</p>
+<h3 id="plugin"><a href="#plugin" class="headerlink" title="plugin"></a>plugin</h3><p>先让我们看一个webpack plugin 简单到不能再简单的例子<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> pluginName = <span class="string">'ConsoleLogOnBuildWebpackPlugin'</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConsoleLogOnBuildWebpackPlugin</span> </span>&#123;</span><br><span class="line">  apply(compiler) &#123;</span><br><span class="line">    compiler.hooks.run.tap(pluginName, compilation =&gt; &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'webpack 构建过程开始！'</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>调用:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123; </span><br><span class="line">  ...</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> ConsoleLogOnBuildWebpackPlugin(),</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>代码很简单, 所有插件都是一个class, 插件传入配置的时候会被实例化, 而webpack在注册plugin的时候会调用这个实例的apply方法, 并把这次构建的compiler作为参数传入,<br>这个compiler会在整个构建周期中存在, 那么这句到底是什么含义?<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">compiler.hooks.run.tap(pluginName, compilation =&gt; &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'webpack 构建过程开始！'</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>其实从代码上可以看到, 这段代码在compiler的钩子<code>run</code>上挂了一个插件,当这个钩子被调用的时候, 我们传入的回调函数将会被执行<code>console.log(&#39;webpack 构建过程开始！&#39;)</code>;<br>那么我们看到的个<code>hooks</code>到底是什么东西? 让我们看一下compiler的源码(注掉不需关注的代码):</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123;</span><br><span class="line">	SyncHook,</span><br><span class="line">	SyncBailHook,</span><br><span class="line">	AsyncParallelHook,</span><br><span class="line">	AsyncSeriesHook</span><br><span class="line">&#125; = <span class="built_in">require</span>(<span class="string">"tapable"</span>);</span><br><span class="line">...</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Compiler</span> </span>&#123;</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * @param &#123;string&#125; context the compilation path</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">constructor</span>(context) &#123;</span><br><span class="line">		<span class="keyword">this</span>.hooks = <span class="built_in">Object</span>.freeze(&#123;</span><br><span class="line">			shouldEmit: <span class="keyword">new</span> SyncBailHook([<span class="string">"compilation"</span>]),</span><br><span class="line">			done: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"stats"</span>]),</span><br><span class="line">			afterDone: <span class="keyword">new</span> SyncHook([<span class="string">"stats"</span>]),</span><br><span class="line">			additionalPass: <span class="keyword">new</span> AsyncSeriesHook([]),</span><br><span class="line">			beforeRun: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"compiler"</span>]),</span><br><span class="line">			run: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"compiler"</span>]), <span class="comment">// &lt;------------- 上面调用的run在这里!!</span></span><br><span class="line">			emit: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"compilation"</span>]),</span><br><span class="line">			assetEmitted: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"file"</span>, <span class="string">"info"</span>]),</span><br><span class="line">			afterEmit: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"compilation"</span>]),</span><br><span class="line">			thisCompilation: <span class="keyword">new</span> SyncHook([<span class="string">"compilation"</span>, <span class="string">"params"</span>]),</span><br><span class="line">			compilation: <span class="keyword">new</span> SyncHook([<span class="string">"compilation"</span>, <span class="string">"params"</span>]),</span><br><span class="line">      normalModuleFactory: <span class="keyword">new</span> SyncHook([<span class="string">"normalModuleFactory"</span>]),</span><br><span class="line">      ...</span><br><span class="line">    &#125;);</span><br><span class="line">    ...</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>可以发现Compiler类的所有hooks都是一个个不同类型的钩子的实例, 而这些钩子都来自于同一个库<code>tapable</code>.</p>
+<h3 id="tapable是什么"><a href="#tapable是什么" class="headerlink" title="tapable是什么"></a>tapable是什么</h3><p><code>tapable</code>是什么?<br>早先的webpack complier 是<code>tapable</code>的实例, 现在仅仅是<code>tapable</code>的调用者, 我也觉得这样更好, 把很多调用放到外部, 远比继承一个第三方库要好, 代码的调用更明显,不再那么隐晦</p>
+<p>实际上webpack编译打包类似于一个流水线, 在流水线上有很多节点, 不同的节点暴露不同的属性和值, 你可以再不同的节点对这些属性和值左调整处理, 最后直到打包完成. 那么webpack流水线中的不同的节点我们成为不同的钩子(hook), 而这些钩子就是由<code>tapable</code>负责生成的. </p>
+<p>今天先说说webpack的事件机制 <code>tapable</code></p>
+<p>tapable很像我们了解的发布订阅模式,我们先看看<code>tapable</code>是怎么做的</p>
+<h3 id="tapable-怎么用"><a href="#tapable-怎么用" class="headerlink" title="tapable 怎么用"></a>tapable 怎么用</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> hook = <span class="keyword">new</span> SyncHook([<span class="string">"arg1"</span>, <span class="string">"arg2"</span>, <span class="string">"arg3"</span>]);</span><br></pre></td></tr></table></figure>
+<p>这里是新声明了一个钩子, 大家留意, <code>SyncHook</code>的实参传入一个数组为参数, 每一个数组item代表将来挂载这个钩子上的回调函数时能够接受到的参数数量. 即时之后我们再触发钩子时传入在多的实参, 也无法超过三个. 但是这里有一个疑问, 但是为什么要这么写? 为什么不能吧触发钩子传入的所有实参都同步给钩子的回调? 这样不是应该更加灵活么?这仅仅是一种类似注释的约定么?方便开发更快的时候钩子回调内的参数是什么? 我们这里留一手, 最后再讲</p>
+<p>我们还是先来看看<code>tapable</code>里面有什么把!它会导出多种钩子类型, 从大的类型里能分为<code>SyncHook</code>, <code>AsyncSeriesHook</code>, <code>AsyncParalleHook</code>这两种, 顾名思义, 一种钩子的所有回调都是同步的, 另两种则是异步的. 两个异步钩子一种是顺序执行,也就是一个接一个, 另一个则是同步执行, 就是一次吧所有钩子回调都执行 </p>
+<p>多个钩子在调用上也有不同的讲究, 通常是根据上一个钩子回调的返回值有不同的处理, 规则有如下三款, 还有一款正在设计当中</p>
+<ul>
+<li>basic (基本款)</li>
+<li>waterfall (大瀑布款)</li>
+<li>bail (保险款)</li>
+<li>loop (自留款, todo…)</li>
+</ul>
+<p>基本款就不多说了, 所有的回调依次调用, 大家好对一个个报数就可以了<br>大瀑布款, 其实所有回调依次调用, 不同的的房是, 每一个回调都能够接受到上一个回调的返回值, 就类似于咱们的击鼓传花啦<br>保险款, 顾名思义, 跟保险丝差不多, 再依次执行回调的时候, 如果有任何一个回调有返回值, 则这个钩子的执行将提前结束</p>
+<p>同步钩子和异步钩子再加上我们刚才说的三款不懂得调用处理方式, 就把整个钩子的类型翻了一倍, 下面这些也就是<code>tapable</code>提供的所有种类钩子:</p>
+<ul>
+<li>SyncHook</li>
+<li>SyncBailHook</li>
+<li>SyncWaterfallHook</li>
+<li>SyncLoopHook</li>
+<li>AsyncParallelHook</li>
+<li>AsyncParallelBailHook</li>
+<li>AsyncSeriesHook</li>
+<li>AsyncSeriesBailHook</li>
+<li>AsyncSeriesWaterfallHook</li>
+</ul>
+<p>上面知道了钩子都叫什么, 也知道了为啥叫这个名字, 下面我们就来看看钩子应该怎么用, 该怎么触发<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义一个钩子</span></span><br><span class="line"><span class="keyword">const</span> hook = <span class="keyword">new</span> SyncHook([<span class="string">"arg1"</span>, <span class="string">"arg2"</span>, <span class="string">"arg3"</span>]);</span><br><span class="line"></span><br><span class="line">hook.tap(<span class="string">'whatEver'</span>, (arg1, arg2, arg3) =&gt; &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(arg1, arg2, arg3) <span class="comment">// 1 2 3</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">hook.call(<span class="number">1</span>, <span class="number">2</span>,<span class="number">3</span>)</span><br></pre></td></tr></table></figure></p>
+<p>实际上第一个参数 可以是一个对象, 里面可以有个<code>before</code>, <code>stage</code>, 用来设置这个plugin插入的位置<br>是不是相继了一般的发布订阅模式? <code>hook.tap</code>是订阅, <code>hook.call</code>是发布</p>
+<p>刚我们看的是最最最简单的<code>SyncHook</code>, 他只有一种挂在钩子回调的方法, 就是<code>tap</code>, 实际上不同的钩子类型, 它提供的挂载方式也不同, 分成三种</p>
+<ul>
+<li>tap</li>
+<li>tapPromise</li>
+<li>tapAsync<br>区别也挺简单的, <code>tap</code>就是同步挂载,挂载的回调函数自然是一个同步函数, <code>tapPromise</code>挂载的异步函数了, 要求他必须返回一个<code>Promise</code>, <code>tabAsync</code>挂载的也是一个异步函数, 函数中的形参<code>callback</code>代表着函数的结束, 类似<code>express</code>的<code>next</code>.</li>
+</ul>
+<p><code>tapable</code>也有拦截器, 其实就是在每个钩子的不同状态触发前的一个控制函数, 让你对整个钩子有更多的控制能力<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">hook.intercept(&#123;</span><br><span class="line">  context: <span class="literal">true</span>, <span class="comment">// 开启时, 可以再拦截函数的第一个参数拿到context对象, context对象也可以从所有的钩子回调中获得</span></span><br><span class="line">  <span class="comment">// hook 触发时</span></span><br><span class="line">	call: <span class="function">(<span class="params">arg1, arg2, arg2</span>) =&gt;</span> &#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// hook 注册时</span></span><br><span class="line">	register: <span class="function">(<span class="params">tapInfo</span>) =&gt;</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> tapInfo; </span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 有新的钩子回调挂进来时</span></span><br><span class="line">  tap: <span class="function">(<span class="params">tap</span>) =&gt;</span> &#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/12/20/深入webpack-tapable篇/" data-id="ck4dnfp7i0004s3rox5cexna5" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-前端N面-elm-lang" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/11/22/前端N面-elm-lang/" class="article-date">
@@ -141,7 +221,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/11/22/前端N面-elm-lang/" data-id="ck39ri89j0003zes6yys54i04" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/11/22/前端N面-elm-lang/" data-id="ck4dnfp7g0003s3rotlia69nv" class="article-share-link">Share</a>
       
       
     </footer>
@@ -204,7 +284,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/10/25/初识Svelte/" data-id="ck39ri89r0004zes6jc69rjw8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/10/25/初识Svelte/" data-id="ck4dnfp7j0005s3ro71k0asce" class="article-share-link">Share</a>
       
       
     </footer>
@@ -286,7 +366,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/08/29/10分钟上手ast/" data-id="ck39ri8950001zes62ago4g7s" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/08/29/10分钟上手ast/" data-id="ck4dnfp7c0001s3ro6azsvg3w" class="article-share-link">Share</a>
       
       
     </footer>
@@ -332,7 +412,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/16/react-router4学习(1)/" data-id="ck39ri8970002zes6derkn4ob" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/16/react-router4学习(1)/" data-id="ck4dnfp7e0002s3royp89bibr" class="article-share-link">Share</a>
       
       
     </footer>
@@ -375,7 +455,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/09/2019学习计划/" data-id="ck39ri8920000zes65k4rev3a" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/09/2019学习计划/" data-id="ck4dnfp780000s3rooia5a53h" class="article-share-link">Share</a>
       
       
     </footer>
@@ -403,7 +483,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
     </div>
   </div>
 
@@ -414,6 +494,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/12/20/深入webpack-tapable篇/">深入webpack-tapable篇</a>
+          </li>
         
           <li>
             <a href="/2019/11/22/前端N面-elm-lang/">前端N面-elm-lang</a>
@@ -429,10 +513,6 @@
         
           <li>
             <a href="/2019/05/16/react-router4学习(1)/">react-router4学习</a>
-          </li>
-        
-          <li>
-            <a href="/2019/05/09/2019学习计划/">2019学习计划</a>
           </li>
         
       </ul>
