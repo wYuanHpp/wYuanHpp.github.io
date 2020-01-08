@@ -1,98 +1,256 @@
 <!DOCTYPE html>
-<html>
-<head><meta name="generator" content="Hexo 3.8.0">
-  <meta charset="utf-8">
-  
+<html lang="en">
 
-  
-  <title>深入webpack-tapable篇 | Hexo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="打算写一些webpack相关的文章, 今天就先打个样 引子说到webpack, 都知道是一个打包工具, 从一个入口开始, 遍历所有依赖, 并把所有文件都打包成一个js文件, webpack在整个构建过程中需要做一系列的工作, 那么它对这些复杂的工作是怎么组织的呢?当我们去看webpack源码的时候, 会发现webpack在初始化的时候调用了大量的没用过的plugin来给compiler提供各种能力">
-<meta property="og:type" content="article">
-<meta property="og:title" content="深入webpack-tapable篇">
-<meta property="og:url" content="http://yoursite.com/2019/12/20/深入webpack-tapable篇/index.html">
-<meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="打算写一些webpack相关的文章, 今天就先打个样 引子说到webpack, 都知道是一个打包工具, 从一个入口开始, 遍历所有依赖, 并把所有文件都打包成一个js文件, webpack在整个构建过程中需要做一系列的工作, 那么它对这些复杂的工作是怎么组织的呢?当我们去看webpack源码的时候, 会发现webpack在初始化的时候调用了大量的没用过的plugin来给compiler提供各种能力">
-<meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-12-20T04:23:33.891Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="深入webpack-tapable篇">
-<meta name="twitter:description" content="打算写一些webpack相关的文章, 今天就先打个样 引子说到webpack, 都知道是一个打包工具, 从一个入口开始, 遍历所有依赖, 并把所有文件都打包成一个js文件, webpack在整个构建过程中需要做一系列的工作, 那么它对这些复杂的工作是怎么组织的呢?当我们去看webpack源码的时候, 会发现webpack在初始化的时候调用了大量的没用过的plugin来给compiler提供各种能力">
-  
-    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  
-    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
-  
-  <link rel="stylesheet" href="/css/style.css">
-</head>
-</html>
-<body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">Hexo</a>
-      </h1>
-      
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="baidu-site-verification" content="093lY4ziMu" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="description" content="A hexo theme">
+    <meta name="keyword"  content="dusign, hexo-theme-snail">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <!--<link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>-->
+    <title>
+        
+          深入webpack-tapable篇 - Hexo-theme-snail
+        
+    </title>
+
+    <link rel="canonical" href="https://dusign.net/2019/12/20/深入webpack-tapable篇/">
+
+    <!-- Bootstrap Core CSS -->
+    
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+
+    <!-- Custom CSS --> 
+    
+        
+<link rel="stylesheet" href="/css/dusign-dark.css">
+
+        
+<link rel="stylesheet" href="/css/dusign-common-dark.css">
+
+        
+<link rel="stylesheet" href="/css/font-awesome.css">
+
+        
+<link rel="stylesheet" href="/css/toc.css">
+
+    
+    
+    <!-- Pygments Highlight CSS -->
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+
+    
+<link rel="stylesheet" href="/css/widget.css">
+
+
+    
+<link rel="stylesheet" href="/css/rocket.css">
+
+
+    
+<link rel="stylesheet" href="/css/signature.css">
+
+
+    
+<link rel="stylesheet" href="/css/fonts.googleapis.css">
+
+
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    
+        <!-- background effects start -->
+        
+        <!-- background effects end -->
+    
+
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            
+                background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url('http://tc.sinaimg.cn/maxwidth.800/tc.service.weibo.com/upload_images_jianshu_io/cfe921ab8d67f6d2555b06aa3130d940.jpg')
+                /*post*/
+            
+        
+    }
+    
+    #signature{
+        background-image: url('/undefined');
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#webpack" title="webpack">webpack</a>
+                            
+                        </div>
+                        <h1>深入webpack-tapable篇</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by wYuanHpp on
+                            2019-12-20
+                        </span>
+
+                        
+
+                    </div>
+                
+
+                </div>
+            </div>
+        </div>      
     </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
-      </div>
+
+    
+    <div class="waveWrapper">
+        <div class="wave wave_before" style="background-image: url('/img/wave-dark.png')"></div>
+        <div class="wave wave_after" style="background-image: url('/img/wave-dark.png')"></div>
     </div>
-  </div>
+    
 </header>
-      <div class="outer">
-        <section id="main"><article id="post-深入webpack-tapable篇" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/12/20/深入webpack-tapable篇/" class="article-date">
-  <time datetime="2019-12-20T04:23:10.000Z" itemprop="datePublished">2019-12-20</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="article-title" itemprop="name">
-      深入webpack-tapable篇
-    </h1>
-  
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>打算写一些webpack相关的文章, 今天就先打个样</p>
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">wYuanHpp Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/photography/">Photography</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <p>打算写一些webpack相关的文章, 今天就先打个样</p>
 <h3 id="引子"><a href="#引子" class="headerlink" title="引子"></a>引子</h3><p>说到webpack, 都知道是一个打包工具, 从一个入口开始, 遍历所有依赖, 并把所有文件都打包成一个js文件, webpack在整个构建过程中需要做一系列的工作, 那么它对这些复杂的工作是怎么组织的呢?<br>当我们去看webpack源码的时候, 会发现webpack在初始化的时候调用了大量的没用过的plugin来给compiler提供各种能力, 让人眼花缭乱的plugin,就这么一个个的挂载到compiler里面, 完全看不懂到底干了点啥子, 所以让我们先看看plugin到底是个啥</p>
 <h3 id="plugin"><a href="#plugin" class="headerlink" title="plugin"></a>plugin</h3><p>先让我们看一个webpack plugin 简单到不能再简单的例子<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> pluginName = <span class="string">'ConsoleLogOnBuildWebpackPlugin'</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConsoleLogOnBuildWebpackPlugin</span> </span>&#123;</span><br><span class="line">  apply(compiler) &#123;</span><br><span class="line">    compiler.hooks.run.tap(pluginName, compilation =&gt; &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'webpack 构建过程开始！'</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>调用:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123; </span><br><span class="line">  ...</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> ConsoleLogOnBuildWebpackPlugin(),</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>代码很简单, 所有插件都是一个class, 插件传入配置的时候会被实例化, 而webpack在注册plugin的时候会调用这个实例的apply方法, 并把这次构建的compiler作为参数传入,<br>这个compiler会在整个构建周期中存在, 那么这句到底是什么含义?<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">compiler.hooks.run.tap(pluginName, compilation =&gt; &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'webpack 构建过程开始！'</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
-<p>其实从代码上可以看到, 这段代码在compiler的钩子<code>run</code>上挂了一个插件,当这个钩子被调用的时候, 我们传入的回调函数将会被执行<code>console.log(&#39;webpack 构建过程开始！&#39;)</code>;<br>那么我们看到的个<code>hooks</code>到底是什么东西? 让我们看一下compiler的源码(注掉不需关注的代码):</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123;</span><br><span class="line">	SyncHook,</span><br><span class="line">	SyncBailHook,</span><br><span class="line">	AsyncParallelHook,</span><br><span class="line">	AsyncSeriesHook</span><br><span class="line">&#125; = <span class="built_in">require</span>(<span class="string">"tapable"</span>);</span><br><span class="line">...</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Compiler</span> </span>&#123;</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * @param &#123;string&#125; context the compilation path</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">constructor</span>(context) &#123;</span><br><span class="line">		<span class="keyword">this</span>.hooks = <span class="built_in">Object</span>.freeze(&#123;</span><br><span class="line">			shouldEmit: <span class="keyword">new</span> SyncBailHook([<span class="string">"compilation"</span>]),</span><br><span class="line">			done: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"stats"</span>]),</span><br><span class="line">			afterDone: <span class="keyword">new</span> SyncHook([<span class="string">"stats"</span>]),</span><br><span class="line">			additionalPass: <span class="keyword">new</span> AsyncSeriesHook([]),</span><br><span class="line">			beforeRun: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"compiler"</span>]),</span><br><span class="line">			run: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"compiler"</span>]), <span class="comment">// &lt;------------- 上面调用的run在这里!!</span></span><br><span class="line">			emit: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"compilation"</span>]),</span><br><span class="line">			assetEmitted: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"file"</span>, <span class="string">"info"</span>]),</span><br><span class="line">			afterEmit: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"compilation"</span>]),</span><br><span class="line">			thisCompilation: <span class="keyword">new</span> SyncHook([<span class="string">"compilation"</span>, <span class="string">"params"</span>]),</span><br><span class="line">			compilation: <span class="keyword">new</span> SyncHook([<span class="string">"compilation"</span>, <span class="string">"params"</span>]),</span><br><span class="line">      normalModuleFactory: <span class="keyword">new</span> SyncHook([<span class="string">"normalModuleFactory"</span>]),</span><br><span class="line">      ...</span><br><span class="line">    &#125;);</span><br><span class="line">    ...</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>代码很简单, 所有插件都是一个class, 插件传入配置的时候会被实例化, 而webpack在注册plugin的时候会调用这个实例的apply方法, 并把这次构建的compiler作为参数传入,<br>这个compiler会在整个构建周期中存在, 那么这句到底是什么含义?<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">compiler.hooks.run.tap(pluginName, compilation =&gt; &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'webpack 构建过程开始！'</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure><br>其实从代码上可以看到, 这段代码在compiler的钩子<code>run</code>上挂了一个插件,当这个钩子被调用的时候, 我们传入的回调函数将会被执行<code>console.log(&#39;webpack 构建过程开始！&#39;)</code>;<br>那么我们看到的个<code>hooks</code>到底是什么东西? 让我们看一下compiler的源码(注掉不需关注的代码):</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123;</span><br><span class="line">	SyncHook,</span><br><span class="line">	SyncBailHook,</span><br><span class="line">	AsyncParallelHook,</span><br><span class="line">	AsyncSeriesHook</span><br><span class="line">&#125; = <span class="built_in">require</span>(<span class="string">"tapable"</span>);</span><br><span class="line">...</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Compiler</span> </span>&#123;</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param <span class="type">&#123;string&#125;</span> </span>context the compilation path</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">constructor</span>(context) &#123;</span><br><span class="line">		<span class="keyword">this</span>.hooks = <span class="built_in">Object</span>.freeze(&#123;</span><br><span class="line">			shouldEmit: <span class="keyword">new</span> SyncBailHook([<span class="string">"compilation"</span>]),</span><br><span class="line">			done: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"stats"</span>]),</span><br><span class="line">			afterDone: <span class="keyword">new</span> SyncHook([<span class="string">"stats"</span>]),</span><br><span class="line">			additionalPass: <span class="keyword">new</span> AsyncSeriesHook([]),</span><br><span class="line">			beforeRun: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"compiler"</span>]),</span><br><span class="line">			run: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"compiler"</span>]), <span class="comment">// &lt;------------- 上面调用的run在这里!!</span></span><br><span class="line">			emit: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"compilation"</span>]),</span><br><span class="line">			assetEmitted: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"file"</span>, <span class="string">"info"</span>]),</span><br><span class="line">			afterEmit: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"compilation"</span>]),</span><br><span class="line">			thisCompilation: <span class="keyword">new</span> SyncHook([<span class="string">"compilation"</span>, <span class="string">"params"</span>]),</span><br><span class="line">			compilation: <span class="keyword">new</span> SyncHook([<span class="string">"compilation"</span>, <span class="string">"params"</span>]),</span><br><span class="line">      normalModuleFactory: <span class="keyword">new</span> SyncHook([<span class="string">"normalModuleFactory"</span>]),</span><br><span class="line">      ...</span><br><span class="line">    &#125;);</span><br><span class="line">    ...</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
 <p>可以发现Compiler类的所有hooks都是一个个不同类型的钩子的实例, 而这些钩子都来自于同一个库<code>tapable</code>.</p>
 <h3 id="tapable是什么"><a href="#tapable是什么" class="headerlink" title="tapable是什么"></a>tapable是什么</h3><p><code>tapable</code>是什么?<br>早先的webpack complier 是<code>tapable</code>的实例, 现在仅仅是<code>tapable</code>的调用者, 我也觉得这样更好, 把很多调用放到外部, 远比继承一个第三方库要好, 代码的调用更明显,不再那么隐晦</p>
 <p>实际上webpack编译打包类似于一个流水线, 在流水线上有很多节点, 不同的节点暴露不同的属性和值, 你可以再不同的节点对这些属性和值左调整处理, 最后直到打包完成. 那么webpack流水线中的不同的节点我们成为不同的钩子(hook), 而这些钩子就是由<code>tapable</code>负责生成的. </p>
@@ -121,8 +279,7 @@
 <li>AsyncSeriesBailHook</li>
 <li>AsyncSeriesWaterfallHook</li>
 </ul>
-<p>上面知道了钩子都叫什么, 也知道了为啥叫这个名字, 下面我们就来看看钩子应该怎么用, 该怎么触发<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义一个钩子</span></span><br><span class="line"><span class="keyword">const</span> hook = <span class="keyword">new</span> SyncHook([<span class="string">"arg1"</span>, <span class="string">"arg2"</span>, <span class="string">"arg3"</span>]);</span><br><span class="line"></span><br><span class="line">hook.tap(<span class="string">'whatEver'</span>, (arg1, arg2, arg3) =&gt; &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(arg1, arg2, arg3) <span class="comment">// 1 2 3</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">hook.call(<span class="number">1</span>, <span class="number">2</span>,<span class="number">3</span>)</span><br></pre></td></tr></table></figure></p>
-<p>实际上第一个参数 可以是一个对象, 里面可以有个<code>before</code>, <code>stage</code>, 用来设置这个plugin插入的位置<br>是不是相继了一般的发布订阅模式? <code>hook.tap</code>是订阅, <code>hook.call</code>是发布</p>
+<p>上面知道了钩子都叫什么, 也知道了为啥叫这个名字, 下面我们就来看看钩子应该怎么用, 该怎么触发<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义一个钩子</span></span><br><span class="line"><span class="keyword">const</span> hook = <span class="keyword">new</span> SyncHook([<span class="string">"arg1"</span>, <span class="string">"arg2"</span>, <span class="string">"arg3"</span>]);</span><br><span class="line"></span><br><span class="line">hook.tap(<span class="string">'whatEver'</span>, (arg1, arg2, arg3) =&gt; &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(arg1, arg2, arg3) <span class="comment">// 1 2 3</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">hook.call(<span class="number">1</span>, <span class="number">2</span>,<span class="number">3</span>)</span><br></pre></td></tr></table></figure><br>实际上第一个参数 可以是一个对象, 里面可以有个<code>before</code>, <code>stage</code>, 用来设置这个plugin插入的位置<br>是不是相继了一般的发布订阅模式? <code>hook.tap</code>是订阅, <code>hook.call</code>是发布</p>
 <p>刚我们看的是最最最简单的<code>SyncHook</code>, 他只有一种挂在钩子回调的方法, 就是<code>tap</code>, 实际上不同的钩子类型, 它提供的挂载方式也不同, 分成三种</p>
 <ul>
 <li>tap</li>
@@ -131,115 +288,301 @@
 </ul>
 <p><code>tapable</code>也有拦截器, 其实就是在每个钩子的不同状态触发前的一个控制函数, 让你对整个钩子有更多的控制能力<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">hook.intercept(&#123;</span><br><span class="line">  context: <span class="literal">true</span>, <span class="comment">// 开启时, 可以再拦截函数的第一个参数拿到context对象, context对象也可以从所有的钩子回调中获得</span></span><br><span class="line">  <span class="comment">// hook 触发时</span></span><br><span class="line">	call: <span class="function">(<span class="params">arg1, arg2, arg2</span>) =&gt;</span> &#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// hook 注册时</span></span><br><span class="line">	register: <span class="function">(<span class="params">tapInfo</span>) =&gt;</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> tapInfo; </span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 有新的钩子回调挂进来时</span></span><br><span class="line">  tap: <span class="function">(<span class="params">tap</span>) =&gt;</span> &#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
 
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/20/深入webpack-tapable篇/" data-id="ck4dnfp7i0004s3rox5cexna5" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-    
-<nav id="article-nav">
-  
-  
-    <a href="/2019/11/22/前端N面-elm-lang/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">前端N面-elm-lang</div>
-    </a>
-  
-</nav>
+                
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                    <li class="next">
+                        <a href="/2019/11/22/前端N面-elm-lang/" data-toggle="tooltip" data-placement="top" title="前端N面-elm-lang">Next Post &rarr;</a>
+                    </li>
+                    
+                </ul>
 
-  
+                <!-- tip start -->
+                
+
+                
+                <div class="comment_notes">
+                    <p>
+                        This is copyright.
+                    </p>
+                </div>
+                
+                <!-- tip end -->
+
+                <!-- Sharing -->
+                
+                <div class="social-share"  data-wechat-qrcode-helper="" align="center"></div>
+                <!--  css & js -->
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css">
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
+                
+                <!-- Sharing -->
+
+                <!-- gitment start -->
+                
+                <!-- gitment end -->
+
+                <!-- 来必力City版安装代码 -->
+                
+                <!-- City版安装代码已完成 -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#webpack" title="webpack">webpack</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+        </div>
+    </div>
 </article>
 
-</section>
-        
-          <aside id="sidebar">
-  
-    
 
-  
-    
 
-  
-    
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+
+
+<style  type="text/css">
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/wYuanHpp">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                
+
+                
+
+                
+
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; wYuanHpp 2020 
+                    <br>
+                    Powered by 
+                    <a href="https://github.com/dusign/hexo-theme-snail" target="_blank" rel="noopener">
+                        <i>hexo-theme-snail</i>
+                    </a> | 
+                    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0"
+                        width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=dusign&repo=hexo-theme-snail&type=star&count=true">
+                    </iframe>
+                </p>
+            </div>
+        </div>
     </div>
-  </div>
 
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2019/12/20/深入webpack-tapable篇/">深入webpack-tapable篇</a>
-          </li>
-        
-          <li>
-            <a href="/2019/11/22/前端N面-elm-lang/">前端N面-elm-lang</a>
-          </li>
-        
-          <li>
-            <a href="/2019/10/25/初识Svelte/">初识Svelte</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/29/10分钟上手ast/">10分钟上手ast</a>
-          </li>
-        
-          <li>
-            <a href="/2019/05/16/react-router4学习(1)/">react-router4学习</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
-</aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      &copy; 2019 John Doe<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
-    </div>
-  </div>
 </footer>
-    </div>
-    <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
+
+<!-- jQuery -->
+
+<script src="/js/jquery.min.js"></script>
+
+
+<!-- Bootstrap Core JavaScript -->
+
+<script src="/js/bootstrap.min.js"></script>
+
+
+<!-- Custom Theme JavaScript -->
+
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- Search -->
+
+<script src="/js/search.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://dusign.net/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Search -->
+
+    <script type="text/javascript">      
+        var search_path = "search.xml";
+        if (search_path.length == 0) {
+            search_path = "search.xml";
+        }
+    var path = "/" + search_path;
+    searchFunc(path, 'local-search-input', 'local-search-result');
+    </script>
+
+
+<!-- busuanzi -->
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+
+    
+        <!-- background effects start -->
+        
+
+        
+
+        <!-- background effects end -->
     
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-
-
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
-
-
-
-  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
+
 </html>
