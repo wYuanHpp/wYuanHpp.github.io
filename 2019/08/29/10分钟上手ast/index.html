@@ -1,592 +1,249 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
 
-<!-- Head tag -->
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
-    <meta name="baidu-site-verification" content="093lY4ziMu" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <meta name="description" content="A hexo theme">
-    <meta name="keyword"  content="dusign, hexo-theme-snail">
-    <link rel="shortcut icon" href="/img/ironman-draw.png">
-    <!-- Place this tag in your head or just before your close body tag. -->
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
-    <!--<link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>-->
-    <title>
-        
-          10分钟上手ast - Hexo-theme-snail
-        
-    </title>
-
-    <link rel="canonical" href="https://dusign.net/2019/08/29/10分钟上手ast/">
-
-    <!-- Bootstrap Core CSS -->
-    
-<link rel="stylesheet" href="/css/bootstrap.min.css">
-
-
-    <!-- Custom CSS --> 
-    
-        
-<link rel="stylesheet" href="/css/dusign-dark.css">
-
-        
-<link rel="stylesheet" href="/css/dusign-common-dark.css">
-
-        
-<link rel="stylesheet" href="/css/font-awesome.css">
-
-        
-<link rel="stylesheet" href="/css/toc.css">
-
-    
-    
-    <!-- Pygments Highlight CSS -->
-    
-<link rel="stylesheet" href="/css/highlight.css">
-
-
-    
-<link rel="stylesheet" href="/css/widget.css">
-
-
-    
-<link rel="stylesheet" href="/css/rocket.css">
-
-
-    
-<link rel="stylesheet" href="/css/signature.css">
-
-
-    
-<link rel="stylesheet" href="/css/fonts.googleapis.css">
-
-
-    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
-
-    <!-- ga & ba script hoook -->
-    <script></script>
-<meta name="generator" content="Hexo 4.2.0"></head>
-
-
-<!-- hack iOS CSS :active style -->
-<body ontouchstart="">
-
-    
-        <!-- background effects start -->
-        
-        <!-- background effects end -->
-    
-
-	<!-- Modified by Yu-Hsuan Yen -->
-<!-- Post Header -->
-<style type="text/css">
-    header.intro-header{
-        
-            
-                background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url('')
-                /*post*/
-            
-        
-    }
-    
-    #signature{
-        background-image: url('/undefined');
-    }
-    
-</style>
-
-<header class="intro-header" >
-    <!-- Signature -->
-    <div id="signature">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-                
-                    <div class="post-heading">
-                        <div class="tags">
-                            
-                        </div>
-                        <h1>10分钟上手ast</h1>
-                        <h2 class="subheading"></h2>
-                        <span class="meta">
-                            Posted by wYuanHpp on
-                            2019-08-29
-                        </span>
-
-                        
-
-                    </div>
-                
-
-                </div>
-            </div>
-        </div>      
+  
+  <title>10分钟上手ast | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="什么是AST AST(Abstract Syntax Tree)简称是抽象语法树,是源代码语法结构的一种抽象表示.它以树状的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构. 比如一下代码: 1const 1 = 5;  这行代码大致会被解析为以下ast 1234567891011121314151617&amp;#123;  &quot;type&quot;: &quot;VariableDeclaration&quot;,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="10分钟上手ast">
+<meta property="og:url" content="http://yoursite.com/2019/08/29/10分钟上手ast/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="什么是AST AST(Abstract Syntax Tree)简称是抽象语法树,是源代码语法结构的一种抽象表示.它以树状的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构. 比如一下代码: 1const 1 = 5;  这行代码大致会被解析为以下ast 1234567891011121314151617&amp;#123;  &quot;type&quot;: &quot;VariableDeclaration&quot;,">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-01-17T19:05:45.875Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="10分钟上手ast">
+<meta name="twitter:description" content="什么是AST AST(Abstract Syntax Tree)简称是抽象语法树,是源代码语法结构的一种抽象表示.它以树状的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构. 比如一下代码: 1const 1 = 5;  这行代码大致会被解析为以下ast 1234567891011121314151617&amp;#123;  &quot;type&quot;: &quot;VariableDeclaration&quot;,">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
     </div>
-
-    
-    <div class="waveWrapper">
-        <div class="wave wave_before" style="background-image: url('/img/wave-dark.png')"></div>
-        <div class="wave wave_after" style="background-image: url('/img/wave-dark.png')"></div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
     </div>
-    
+  </div>
 </header>
+      <div class="outer">
+        <section id="main"><article id="post-10分钟上手ast" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/08/29/10分钟上手ast/" class="article-date">
+  <time datetime="2019-08-29T12:06:26.000Z" itemprop="datePublished">2019-08-29</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      10分钟上手ast
+    </h1>
+  
 
-	
-    <!-- Navigation -->
-<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
-    <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header page-scroll">
-            <button type="button" class="navbar-toggle">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="/">wYuanHpp Blog</a>
-        </div>
-
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <!-- Known Issue, found by Hux:
-            <nav>'s height woule be hold on by its content.
-            so, when navbar scale out, the <nav> will cover tags.
-            also mask any touch event of tags, unfortunately.
-        -->
-        <div id="huxblog_navbar">
-            <div class="navbar-collapse">
-                <ul class="nav navbar-nav navbar-right">
-                    <li>
-                        <a href="/">Home</a>
-                    </li>
-
-                    
-
-                        
-                    
-
-                        
-                        <li>
-                            <a href="/archive/">Archives</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
-                            <a href="/about/">About</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
-                            <a href="/photography/">Photography</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
-                            <a href="/tags/">Tags</a>
-                        </li>
-                        
-                    
-                </ul>
-            </div>
-        </div>
-        <!-- /.navbar-collapse -->
-    </div>
-    <!-- /.container -->
-</nav>
-<script>
-    // Drop Bootstarp low-performance Navbar
-    // Use customize navbar with high-quality material design animation
-    // in high-perf jank-free CSS3 implementation
-    var $body   = document.body;
-    var $toggle = document.querySelector('.navbar-toggle');
-    var $navbar = document.querySelector('#huxblog_navbar');
-    var $collapse = document.querySelector('.navbar-collapse');
-
-    $toggle.addEventListener('click', handleMagic)
-    function handleMagic(e){
-        if ($navbar.className.indexOf('in') > 0) {
-        // CLOSE
-            $navbar.className = " ";
-            // wait until animation end.
-            setTimeout(function(){
-                // prevent frequently toggle
-                if($navbar.className.indexOf('in') < 0) {
-                    $collapse.style.height = "0px"
-                }
-            },400)
-        }else{
-        // OPEN
-            $collapse.style.height = "auto"
-            $navbar.className += " in";
-        }
-    }
-</script>
-
-
-    <!-- Main Content -->
-    <!-- Post Content -->
-<article>
-    <div class="container">
-        <div class="row">
-
-            <!-- Post Container -->
-            <div class="
-                col-lg-8 col-lg-offset-2
-                col-md-10 col-md-offset-1
-                post-container">
-
-                <h2 id="什么是AST"><a href="#什么是AST" class="headerlink" title="什么是AST"></a>什么是AST</h2><p>AST(Abstract Syntax Tree)简称是抽象语法树,是源代码语法结构的一种抽象表示.它以树状的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构.<br> AST(Abstract Syntax Tree)简称是抽象语法树,是源代码语法结构的一种抽象表示.它以树状的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构.<br>AST(Abstract Syntax Tree)简称是抽象语法树,是源代码语法结构的一种抽象表示.它以树状的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构.<br>在现在的前端工程中, 有大量工具都在使用ast,比如 <code>eslint</code> <code>webpack</code> <code>uglify</code>等.</p>
-<p>那么ast到底长什么样子?</p>
-<p> 比如一下代码:<br> <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> a = <span class="number">5</span>;</span><br></pre></td></tr></table></figure></p>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="什么是AST"><a href="#什么是AST" class="headerlink" title="什么是AST"></a>什么是AST</h2><p> AST(Abstract Syntax Tree)简称是抽象语法树,是源代码语法结构的一种抽象表示.它以树状的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构.<br> 比如一下代码:<br> <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="number">1</span> = <span class="number">5</span>;</span><br></pre></td></tr></table></figure></p>
 <p> 这行代码大致会被解析为以下ast<br> <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"type"</span>: <span class="string">"VariableDeclaration"</span>,</span><br><span class="line">  <span class="attr">"declarations"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"type"</span>: <span class="string">"VariableDeclarator"</span>,</span><br><span class="line">      <span class="attr">"id"</span>: &#123;</span><br><span class="line">        <span class="attr">"type"</span>: <span class="string">"Identifier"</span>,</span><br><span class="line">        <span class="attr">"name"</span>: <span class="string">"a"</span></span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">"init"</span>: &#123;</span><br><span class="line">        <span class="attr">"type"</span>: <span class="string">"NumericLiteral"</span>,</span><br><span class="line">        <span class="attr">"value"</span>: <span class="number">5</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  <span class="attr">"kind"</span>: <span class="string">"const"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>这里推荐一个工具 <a href="https://astexplorer.net/" target="_blank" rel="noopener">ast explorer</a>, 它可以帮你快速把代码转换成ast, 提高你的开发效率</p>
-<p> 可以看出来, 代码变成了一个树结构, 描述了一个变量的赋值. 那么我们能用ast来做点什么呢?</p>
+<p> 可以看出来, 代码变成了一个树结构的数组对象, 描述了一个对一个变量的赋值. 那么我们能用ast来做点什么呢?</p>
 <h2 id="重新认识babel"><a href="#重新认识babel" class="headerlink" title="重新认识babel"></a>重新认识babel</h2><p> 社区里, 能够解析js代码到ast的工具有很多, 这里我们就使用大家都比较熟悉的babel来举例</p>
-<p>babel的执行过程通常分为 parse transfer generate 三个部分</p>
-<p> <code>babel</code>是一个js编译器,能够把es6等语法编译成es5, 并且他还提供了丰富的工具,可以让我们做很多我们想干的事情.比如:</p>
- <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; Button &#125; <span class="keyword">from</span> <span class="string">'element'</span></span><br></pre></td></tr></table></figure>
-<p> 转化成:<br> <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; Button &#125; <span class="keyword">from</span> <span class="string">'element/es'</span></span><br></pre></td></tr></table></figure></p>
+<p> <code>babel</code>是一个js编译器,能够把es6等语法编译成es5, 并且他还提供了丰富的工具,可以让我们做很多我们想干的事情.比如:<br> <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; Button &#125; <span class="keyword">from</span> <span class="string">'element'</span></span><br></pre></td></tr></table></figure></p>
+<p> 转化成:<br> <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Button <span class="keyword">from</span> <span class="string">'element/lib/Button'</span></span><br></pre></td></tr></table></figure></p>
 <p>如果想完成这样的事情,我们需要大概了解一下babel的工具包  </p>
 <ol>
 <li><code>@babel/parser</code>用来把js代码转换成ast</li>
 <li><code>@babel/traverse</code>用来帮助你遍历ast</li>
 <li><code>@babel/types</code> 用来帮助你判断ast节点,或生成相应的节点</li>
+<li><code>@babel/generator</code> 用来把ast从新转换成js代码</li>
 </ol>
 <h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><p>让我们想一下, 如果要把代码a转变成代码b, 应该是一个什么思路?我的思路是:</p>
 <ol>
 <li>先吧js转换成ast</li>
-<li>遍历ast</li>
-<li>修改需要调整的节点</li>
-<li>把修改过后的ast转换为js代码并输出</li>
+<li>遍历ast收集信息</li>
+<li>更具收集的信息生成ast</li>
+<li>把新生城的ast转换为js代码并输出</li>
 </ol>
-<h3 id="第一步-转换源码到ast"><a href="#第一步-转换源码到ast" class="headerlink" title="第一步,转换源码到ast"></a>第一步,转换源码到ast</h3><p>babel的<code>@babel/parser</code> 是用的他们自己开发的 <code>babylon</code>来实现的, 而<code>babylon</code> 是fork的’acorn’, 而<code>acorn</code>号称是最快并且最小的js ast parser<br>目前社区还有各种ast parser实现:</p>
-<ul>
-<li>uglifyjs</li>
-<li>esprima</li>
-<li>acorn</li>
-<li>babylon<br>等等</li>
-</ul>
-<p>他们基本上都是按照 Mozilla 的<a href="https://github.com/estree/estree" target="_blank" rel="noopener">The ESTree Spec</a>来实现的, 对ast的各种node有兴趣的同学可以好好看看</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; parse &#125; <span class="keyword">from</span> <span class="string">'@babel/parser'</span>;</span><br><span class="line"><span class="keyword">import</span> traverse <span class="keyword">from</span> <span class="string">"@babel/traverse"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> code = <span class="string">"import &#123; Button &#125; from 'element'"</span>;</span><br><span class="line"><span class="comment">// 生成传入code的ast</span></span><br><span class="line"><span class="keyword">const</span> ast = parse(code);</span><br></pre></td></tr></table></figure>
-<h3 id="遍历ast的对应节点"><a href="#遍历ast的对应节点" class="headerlink" title="遍历ast的对应节点"></a>遍历ast的对应节点</h3><p>在获取ast之后, 需要的就是遍历我们需要处理的节点, 收集import导出的变量和对应的source,这里会用到<code>@babel/traverse</code>用来帮助你遍历ast  </p>
-<p>可以通过<code>enter</code> 或者是<code>exit</code> 访问到节点, <code>enter</code>是在进入节点时调用, <code>exit</code>是在离开节点时调用<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">traverse(ast, &#123;</span><br><span class="line">  enter(path) &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;,</span><br><span class="line">  exit(path) &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
-<p>如果不需要遍历所有节点, 可以只设置特定节点进行访问</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">traverse(ast, &#123;</span><br><span class="line">  FunctionDeclaration: <span class="function"><span class="keyword">function</span>(<span class="params">path</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>对节点的访问过程中,通常我们需要去判断节点的类型, 这个是有就会用到我们的<code>babel@type</code>, 他提供了相关的断言函数来判断传入的节点是否是你要访问的节点,<br>并且也有相关的工具函数来生成对应的节点, 下面我们看看具体怎么用吧!</p>
-<p>在这一步,首先我们需要找到我们需要调整的的import节点, 之后对import的source进行修改:</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> names = [];</span><br><span class="line">traverse(ast, &#123;</span><br><span class="line">    ImportDeclaration: <span class="function"><span class="keyword">function</span>(<span class="params">path</span>) </span>&#123;  <span class="comment">// 只处理import语句</span></span><br><span class="line">      <span class="keyword">const</span> sourceValue = path.node.source.value;</span><br><span class="line">      <span class="keyword">if</span> (sourceValue === <span class="string">'element'</span>) &#123;</span><br><span class="line">        path.node.source = types.stringLiteral(<span class="string">`<span class="subst">$&#123;sourceValue&#125;</span>/es`</span>)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<h3 id="还原代码"><a href="#还原代码" class="headerlink" title="还原代码"></a>还原代码</h3><p>最后一步也是最简单的一步, 把ast还原成代码</p>
-<p>这里用到了<code>babel@generator</code>, 这个工具是用来把传入的ast转换为源码的,也可以导出源码的sourceMap</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 把ast转换成js代码并输出</span></span><br><span class="line"><span class="keyword">const</span> convertCode = generator(ast).code;</span><br><span class="line"><span class="keyword">return</span> convertCode; <span class="comment">// import &#123; Button &#125; from 'element/es'</span></span><br></pre></td></tr></table></figure>
+<h3 id="第一步-转换ast"><a href="#第一步-转换ast" class="headerlink" title="第一步,转换ast"></a>第一步,转换ast</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; parse &#125; <span class="keyword">from</span> <span class="string">'@babel/parser'</span>;</span><br><span class="line"><span class="keyword">import</span> traverse <span class="keyword">from</span> <span class="string">"@babel/traverse"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> code = <span class="string">"import &#123; Button &#125; from 'element'"</span>;</span><br><span class="line"><span class="comment">// 生成传入code的ast</span></span><br><span class="line"><span class="keyword">const</span> ast = parse(code);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> names = [];</span><br><span class="line">traverse(ast, &#123;</span><br><span class="line">    ImportDeclaration: <span class="function"><span class="keyword">function</span>(<span class="params">path</span>) </span>&#123;  <span class="comment">// 只处理import语句</span></span><br><span class="line">      <span class="keyword">const</span> sourceValue = path.node.source.value;</span><br><span class="line">      <span class="keyword">if</span> (sourceValue === <span class="string">'element'</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (types.isImportSpecifier(specifier)) &#123;  <span class="comment">// 只处理解构方式声明的变量明</span></span><br><span class="line">          <span class="comment">// 拿到所有结构的变量名</span></span><br><span class="line">          names.push(specifier.local.name);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">//根据收集到的解构变量名list,生成新的ast</span></span><br><span class="line"><span class="keyword">const</span> body = names.map(<span class="function">(<span class="params">name</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> source = types.stringLiteral(<span class="string">`element/lib/<span class="subst">$&#123;name&#125;</span>`</span>); <span class="comment">// 生成source节点</span></span><br><span class="line">  <span class="keyword">const</span> specifier = types.importDefaultSpecifier(types.identifier(name)); <span class="comment">// 生成 specifier节点</span></span><br><span class="line">  <span class="keyword">return</span> types.ImportDeclaration([specifier], source);  <span class="comment">// 生成Import声明节点</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在外面包了一层program节点, 生成完整的树</span></span><br><span class="line"><span class="keyword">const</span> convertedAst = types.program(body, [], <span class="string">'module'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 把ast转换成js代码并输出</span></span><br><span class="line"><span class="keyword">const</span> convertCode = generator(convertedAst).code;</span><br><span class="line"><span class="keyword">return</span> convertCode; <span class="comment">// import Button from 'element/lib/Button'</span></span><br></pre></td></tr></table></figure>
 <p>以上就是这个简单小功能的用法, 可以发现其实就是按部就班的来,类似于把大象放进冰箱的思路</p>
 <p>其实在生成js代码的时候也可以用<code>@babel/template</code>来做, 也可能会更方便, 相关的工具api可以再babel的主页上查找</p>
 <p>也许这个babel的小栗子可以为你打开一扇门, 让你能够知道, 其实你可以做的更多</p>
 
-                
-                <hr>
-                <!-- Pager -->
-                <ul class="pager">
-                    
-                    <li class="previous">
-                        <a href="/2019/10/25/初识Svelte/" data-toggle="tooltip" data-placement="top" title="初识Svelte">&larr; Previous Post</a>
-                    </li>
-                    
-                    
-                    <li class="next">
-                        <a href="/2019/05/16/react-router4学习(1)/" data-toggle="tooltip" data-placement="top" title="react-router4学习">Next Post &rarr;</a>
-                    </li>
-                    
-                </ul>
-
-                <!-- tip start -->
-                
-
-                
-                <div class="comment_notes">
-                    <p>
-                        This is copyright.
-                    </p>
-                </div>
-                
-                <!-- tip end -->
-
-                <!-- Sharing -->
-                
-                <div class="social-share"  data-wechat-qrcode-helper="" align="center"></div>
-                <!--  css & js -->
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css">
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
-                
-                <!-- Sharing -->
-
-                <!-- gitment start -->
-                
-                <!-- gitment end -->
-
-                <!-- 来必力City版安装代码 -->
-                
-                <!-- City版安装代码已完成 -->
-
-                <!-- disqus comment start -->
-                
-                <!-- disqus comment end -->
-            </div>
-            
-            <!-- Tabe of Content -->
-            <!-- Table of Contents -->
-
-                
-            <!-- Sidebar Container -->
-            <div class="
-                col-lg-8 col-lg-offset-2
-                col-md-10 col-md-offset-1
-                sidebar-container">
-
-                <!-- Featured Tags -->
-                
-                <section>
-                    <!-- no hr -->
-                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
-                    <div class="tags">
-                       
-                    </div>
-                </section>
-                
-
-                <!-- Friends Blog -->
-                
-            </div>
-        </div>
+      
     </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/08/29/10分钟上手ast/" data-id="ck622ctfd0001yerowg3dshuy" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2019/10/25/初识Svelte/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          初识Svelte
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/05/16/react-router4学习(1)/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">react-router4学习</div>
+    </a>
+  
+</nav>
+
+  
 </article>
 
+</section>
+        
+          <aside id="sidebar">
+  
+    
 
-
-
-<!-- async load function -->
-<script>
-    function async(u, c) {
-      var d = document, t = 'script',
-          o = d.createElement(t),
-          s = d.getElementsByTagName(t)[0];
-      o.src = u;
-      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
-      s.parentNode.insertBefore(o, s);
-    }
-</script>
-<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
-<script>
-    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
-        anchors.options = {
-          visible: 'hover',
-          placement: 'left',
-          icon: 'ℬ'
-        };
-        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
-    })
-</script>
-
-
-<style  type="text/css">
-    /* place left on bigger screen */
-    @media all and (min-width: 800px) {
-        .anchorjs-link{
-            position: absolute;
-            left: -0.75em;
-            font-size: 1.1em;
-            margin-top : -0.1em;
-        }
-    }
-</style>
-
-
-
-    <!-- Footer -->
-    <!-- Footer -->
-<footer>
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-                <ul class="list-inline text-center">
-
-                
-                    <li>
-                        <a target="_blank"  href="https://github.com/wYuanHpp">
-                            <span class="fa-stack fa-lg">
-                                <i class="fa fa-circle fa-stack-2x"></i>
-                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
-                            </span>
-                        </a>
-                    </li>
-                
-
-                
-
-                
-
-                
-
-                
-
-                
-
-                
-
-                </ul>
-                <p class="copyright text-muted">
-                    Copyright &copy; wYuanHpp 2020 
-                    <br>
-                    Powered by 
-                    <a href="https://github.com/dusign/hexo-theme-snail" target="_blank" rel="noopener">
-                        <i>hexo-theme-snail</i>
-                    </a> | 
-                    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0"
-                        width="100px" height="20px"
-                        src="https://ghbtns.com/github-btn.html?user=dusign&repo=hexo-theme-snail&type=star&count=true">
-                    </iframe>
-                </p>
-            </div>
-        </div>
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li></ul>
     </div>
+  </div>
 
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/webpack/" style="font-size: 10px;">webpack</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/01/31/深入webpack-插件/">深入webpack-插件</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/20/深入webpack-tapable篇/">深入webpack-tapable篇</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/22/前端N面-elm-lang/">前端N面-elm-lang</a>
+          </li>
+        
+          <li>
+            <a href="/2019/10/25/初识Svelte/">初识Svelte</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/29/10分钟上手ast/">10分钟上手ast</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
 </footer>
-
-<!-- jQuery -->
-
-<script src="/js/jquery.min.js"></script>
-
-
-<!-- Bootstrap Core JavaScript -->
-
-<script src="/js/bootstrap.min.js"></script>
-
-
-<!-- Custom Theme JavaScript -->
-
-<script src="/js/hux-blog.min.js"></script>
-
-
-<!-- Search -->
-
-<script src="/js/search.js"></script>
-
-
-<!-- async load function -->
-<script>
-    function async(u, c) {
-      var d = document, t = 'script',
-          o = d.createElement(t),
-          s = d.getElementsByTagName(t)[0];
-      o.src = u;
-      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
-      s.parentNode.insertBefore(o, s);
-    }
-</script>
-
-
-<!-- jquery.tagcloud.js -->
-<script>
-    // only load tagcloud.js in tag.html
-    if($('#tag_cloud').length !== 0){
-        async("https://dusign.net/js/jquery.tagcloud.js",function(){
-            $.fn.tagcloud.defaults = {
-                //size: {start: 1, end: 1, unit: 'em'},
-                color: {start: '#bbbbee', end: '#0085a1'},
-            };
-            $('#tag_cloud a').tagcloud();
-        })
-    }
-</script>
-
-<!--fastClick.js -->
-<script>
-    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
-        var $nav = document.querySelector("nav");
-        if($nav) FastClick.attach($nav);
-    })
-</script>
-
-
-<!-- Google Analytics -->
-
-
-<script>
-    // dynamic User by Hux
-    var _gaId = 'UA-XXXXXXXX-X';
-    var _gaDomain = 'yoursite';
-
-    // Originial
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-    ga('create', _gaId, _gaDomain);
-    ga('send', 'pageview');
-</script>
-
-
-
-
-<!-- Baidu Tongji -->
-
-
-<!-- Search -->
-
-    <script type="text/javascript">      
-        var search_path = "search.xml";
-        if (search_path.length == 0) {
-            search_path = "search.xml";
-        }
-    var path = "/" + search_path;
-    searchFunc(path, 'local-search-input', 'local-search-result');
-    </script>
-
-
-<!-- busuanzi -->
-<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-
-
-
-
-
-	<a id="rocket" href="#top" class=""></a>
-	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
-    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
-
-    
-        <!-- background effects start -->
-        
-
-        
-
-        <!-- background effects end -->
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
     
 
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
 </body>
-
 </html>

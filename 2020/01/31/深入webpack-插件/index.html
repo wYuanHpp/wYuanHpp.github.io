@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>深入webpack-插件 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="webpack目前是前端打包工具使用最多的工具, 这不仅仅是因为它有非常好的打包性能, 还应为它具备非常强的扩展性,可以为不同的场景进行功能的扩展. 如果我们去浏览一下webpack的源码, 我们会发现webpack源码里有了非常非常多的插件,在看过一部分webpack源码后你会发现, 实际上webpack的所有功能都是用一个一个插件堆砌出来的.下面我们先讲一讲webpack插件的核心逻辑到底是什">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入webpack-插件">
+<meta property="og:url" content="http://yoursite.com/2020/01/31/深入webpack-插件/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="webpack目前是前端打包工具使用最多的工具, 这不仅仅是因为它有非常好的打包性能, 还应为它具备非常强的扩展性,可以为不同的场景进行功能的扩展. 如果我们去浏览一下webpack的源码, 我们会发现webpack源码里有了非常非常多的插件,在看过一部分webpack源码后你会发现, 实际上webpack的所有功能都是用一个一个插件堆砌出来的.下面我们先讲一讲webpack插件的核心逻辑到底是什">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://moka-sugar.oss-cn-beijing.aliyuncs.com/img/20200131182933.jpg">
+<meta property="og:updated_time" content="2020-01-31T11:07:20.747Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深入webpack-插件">
+<meta name="twitter:description" content="webpack目前是前端打包工具使用最多的工具, 这不仅仅是因为它有非常好的打包性能, 还应为它具备非常强的扩展性,可以为不同的场景进行功能的扩展. 如果我们去浏览一下webpack的源码, 我们会发现webpack源码里有了非常非常多的插件,在看过一部分webpack源码后你会发现, 实际上webpack的所有功能都是用一个一个插件堆砌出来的.下面我们先讲一讲webpack插件的核心逻辑到底是什">
+<meta name="twitter:image" content="https://moka-sugar.oss-cn-beijing.aliyuncs.com/img/20200131182933.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-深入webpack-插件" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/01/31/深入webpack-插件/" class="article-date">
+  <time datetime="2020-01-31T02:11:46.000Z" itemprop="datePublished">2020-01-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      深入webpack-插件
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><code>webpack</code>目前是前端打包工具使用最多的工具, 这不仅仅是因为它有非常好的打包性能, 还应为它具备非常强的扩展性,可以为不同的场景进行功能的扩展.</p>
+<p>如果我们去浏览一下<code>webpack</code>的源码, 我们会发现<code>webpack</code>源码里有了非常非常多的插件,在看过一部分<code>webpack</code>源码后你会发现, 实际上<code>webpack</code>的所有功能都是用一个一个插件堆砌出来的.下面我们先讲一讲<code>webpack</code>插件的核心逻辑到底是什么.</p>
+<h2 id="打包的主要流程"><a href="#打包的主要流程" class="headerlink" title="打包的主要流程"></a>打包的主要流程</h2><p>我们把<code>webpack</code>的构建过程想象成是一个有大量生命周期的一个MVVM前端组件, 从组件初始化到成功的渲染的页面上会触发多个生命周期, 在不同的生命周期来会触发不同的回调函数,而回调函数可以访问到组件的内部状态.</p>
+<p><code>webpack</code>在每一次构建的时候会生成一个<code>compiler</code>对象, 这个对象就类似于一个组件实例, 所有的生命周期都是对这个<code>compiler</code>对象的状态描述.<code>compiler</code>对象会依次触发它上面的每一个生命周期, 只不过在<code>webpack</code>里我们不叫它生命周期, 叫做<strong>钩子</strong></p>
+<p><code>webpack</code>里所有的对象几乎都是由类来生成的, 而钩子就是在类的<code>constructor</code>方法中进行初始化. 看过上一篇对tapable介绍的同学应该知道, 这里在大概说一下:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Compiler</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>(context) &#123;</span><br><span class="line">    <span class="keyword">this</span>.hook = &#123;</span><br><span class="line">      <span class="comment">/** @type &#123;SyncBailHook&lt;[string, Entry], boolean&gt;&#125; 处理webpack config option */</span></span><br><span class="line">      entryOption: <span class="keyword">new</span> SyncBailHook([<span class="string">"context"</span>, <span class="string">"entry"</span>])</span><br><span class="line">      <span class="comment">/** @type &#123;AsyncSeriesHook&lt;[Compiler]&gt;&#125; 正式开始 */</span></span><br><span class="line">      run: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"compiler"</span>]),</span><br><span class="line">      <span class="comment">/** @type &#123;SyncHook&lt;[CompilationParams]&gt;&#125; 编译 */</span></span><br><span class="line">      compile: <span class="keyword">new</span> SyncHook([<span class="string">"params"</span>]),</span><br><span class="line">      <span class="comment">/** @type &#123;SyncHook&lt;[Compilation, CompilationParams]&gt;&#125; 生成 compilation */</span></span><br><span class="line">      compilation: <span class="keyword">new</span> SyncHook([<span class="string">"compilation"</span>, <span class="string">"params"</span>]),</span><br><span class="line">      <span class="comment">/** @type &#123;AsyncParallelHook&lt;[Compilation], Module&gt;&#125; 生成依赖树 */</span></span><br><span class="line">      make: <span class="keyword">new</span> AsyncParallelHook([<span class="string">"compilation"</span>]),</span><br><span class="line">      <span class="comment">/** @type &#123;AsyncSeriesHook&lt;[Compilation]&gt;&#125; 写入文件系统 */</span></span><br><span class="line">      emit: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"compilation"</span>]),</span><br><span class="line">      <span class="comment">/** @type &#123;AsyncSeriesHook&lt;[Stats]&gt;&#125; 完成 */</span></span><br><span class="line">      done: <span class="keyword">new</span> AsyncSeriesHook([<span class="string">"stats"</span>]),</span><br><span class="line">      <span class="comment">/** @type &#123;SyncHook&lt;[Error]&gt;&#125; 失败 */</span></span><br><span class="line">      failed: <span class="keyword">new</span> SyncHook([<span class="string">"error"</span>]),</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面列出的钩子并不是所有的,做了很大的精简, 书写顺序合调用顺序一致,<a href="https://webpack.docschina.org/api/compiler-hooks/" target="_blank" rel="noopener">compiler钩子完整列表</a></p>
+<h2 id="如何使用钩子"><a href="#如何使用钩子" class="headerlink" title="如何使用钩子"></a>如何使用钩子</h2><p>那么在实例化<code>Compiler</code>后生成了对象<code>compiler</code>,当我们拿到compiler对象后, 我们就可以为compiler对象上面的各种钩子添加对应的回调函数.</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> compiler = <span class="keyword">new</span> Compiler();</span><br><span class="line">compiler.hooks.compilation.tap(<span class="string">'pluginName'</span>, (compilation, params) =&gt; &#123;</span><br><span class="line">  <span class="comment">// 通过对给对应的钩子添加回调函数, 在回调函数执行时,就可以拿到对应的对象</span></span><br><span class="line">  <span class="comment">// 泽辉这个钩子里, 我们可以拿到compilation对象</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>看上去载一个钩子上添加回调函数是是非容易的. 但是问题来了, 我们怎样才能获取到compiler对象呢? 这里webpack插件就需要登场了</p>
+<h2 id="如何写一个插件"><a href="#如何写一个插件" class="headerlink" title="如何写一个插件"></a>如何写一个插件</h2><p>官方的plugin示例是这样的:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Plugin</span> </span>&#123;</span><br><span class="line">  apply(compiler) &#123;</span><br><span class="line">    <span class="comment">// 获得compiler了!</span></span><br><span class="line">    compiler.hooks.compilation.tap(<span class="function">(<span class="params">compilation, params</span>) =&gt;</span> &#123; </span><br><span class="line">      ...</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在定义好plugin后, 在webpack的config文件中引入这个plugin, 并在对应位置调用:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Plugin = <span class="built_in">require</span>(<span class="string">'./Plugin.js'</span>);</span><br><span class="line"><span class="built_in">module</span>.export = &#123;</span><br><span class="line">  ...</span><br><span class="line">  plugins: [<span class="keyword">new</span> Plugin()],</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>那么我们自定义的plugin是如何调用,在什么时候注入到<code>compiler</code>里的呢?我们来看一下初始化<code>compiler</code>的代码, 我们发现在生成<code>compiler</code>的时候:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> createCompiler = <span class="function"><span class="params">options</span> =&gt;</span> &#123;</span><br><span class="line">  options = <span class="keyword">new</span> WebpackOptionsDefaulter().process(options);</span><br><span class="line">  <span class="comment">// 生成一个compiler对象</span></span><br><span class="line">  <span class="keyword">const</span> compiler = <span class="keyword">new</span> Compiler(options.context);</span><br><span class="line">  <span class="comment">// 依次调用插件</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Array</span>.isArray(options.plugins)) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> plugin <span class="keyword">of</span> options.plugins) &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">typeof</span> plugin === <span class="string">"function"</span>) &#123;</span><br><span class="line">        plugin.call(compiler, compiler);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        plugin.apply(compiler);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>从上面的源码我们可以看出来, 插件仅仅可以是一个类, 也可以是一个函数, 使用方法大概是:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用function的方式挂载插件</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">plugin</span>(<span class="params">compiler</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 获得compiler了!</span></span><br><span class="line">  compiler.hooks.compilation.tap(<span class="function">(<span class="params">compilation, params</span>) =&gt;</span> &#123; </span><br><span class="line">    ...</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">module</span>.export = &#123;</span><br><span class="line">  ...</span><br><span class="line">  plugins: [plugin],</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>还有一种挂载插件的方式是在使用<code>node</code> api来调用<code>webpack()</code>打包的时候, 在拿到返回的<code>compiler</code>对象后,手动调用插件:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Plugin = <span class="built_in">require</span>(<span class="string">'./Plugin.js'</span>);</span><br><span class="line"><span class="keyword">const</span> compiler = webpack(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">&#125;);</span><br><span class="line"><span class="comment">// 手动调用插件</span></span><br><span class="line">(<span class="keyword">new</span> Plugin()).apply(compiler);</span><br></pre></td></tr></table></figure></p>
+<p>不过这种方法并不适用与所有的场景, 因为在调用webpack的过程中,会有一些钩子已经运行完毕, 并不推荐.</p>
+<p>上面的几个插件声明的示例都使用的是<code>compilation</code>钩子, 回调函数种可以拿到一个<code>compilation</code>对象, 那么它到底是什么呢?</p>
+<h2 id="complication"><a href="#complication" class="headerlink" title="complication"></a>complication</h2><p>每一个compiler对象会在构建的时候会生成一个compilation对象, 用来保存在整个构建过程中产生的不同数据, 比如解析模块的结果缓存, 依赖模块图, 依赖文件图, chunk图等.compilation对象会在<code>compile</code>之后的大部分钩子回调中获得.</p>
+<p>webpack的整个构建过程产生的数据信息都保存在compiler对象合compilation对象上,那么既然插件能够拿到这两个对象说明插件能够对webpack的全部构建流程进行干预.事实上也是如此. webpack的整个核心功能几乎都是由内部上百个私有插件呢组织而成的.所以说webpack插件的扩展能力是非常强大的.</p>
+<p>compiler和compilation之间的关系:<br><img src="https://moka-sugar.oss-cn-beijing.aliyuncs.com/img/20200131182933.jpg" alt></p>
+<p><code>compilation</code>对象里有大量的钩子, <a href="https://webpack.js.org/api/compilation-hooks/" target="_blank" rel="noopener">具体列表</a></p>
+<h2 id="一个简单的例子"><a href="#一个简单的例子" class="headerlink" title="一个简单的例子"></a>一个简单的例子</h2><p>现在我们希望在webpack构建完毕后,获取构建时依赖的所有项目文件.</p>
+<p>目前的思路是获取到compilation对象, 上面应该有所有的依赖文件列表.</p>
+<p>为了保证compilation对象上的依赖文件列表是已经收集完整的了,所以我们再选择钩子的时候要确保构建过程已经结束,依赖收集已经完毕的钩子<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.export = <span class="class"><span class="keyword">class</span> <span class="title">exportDepPlugin</span> </span>&#123;</span><br><span class="line">  apply(compiler) &#123;</span><br><span class="line">    <span class="comment">// emit钩子 说明整个构建已经完成, 准备输出文件,这是依赖已经收集完毕</span></span><br><span class="line">    compiler.hooks.emit.tagAsync(<span class="string">'exportDepPlugin'</span>, (compilation) =&gt; &#123;</span><br><span class="line">      <span class="keyword">const</span> _fileDependencies= <span class="built_in">Array</span>.from(compilation.fileDependencies);<span class="comment">// fileDependencies是一个Set</span></span><br><span class="line">    &#125;) </span><br><span class="line">      <span class="comment">// 排除node_modules里的文件</span></span><br><span class="line">      <span class="keyword">const</span> dep = _fileDependencies.filter(<span class="function">(<span class="params">d</span>) =&gt;</span> !d.includes(<span class="string">'node_modules'</span>));</span><br><span class="line">      <span class="built_in">console</span>.log(dep);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>webpack的插件功能非常强大, 因为它能够访问到webpack构建过程中的两个核心对象,并做出干预.而且你也可以自己为这几个对象添加新的钩子,好让其他第三方插件来对你的插件进行二次扩展.</p>
+<p>webpack的这种插件机制因为使用了类似发布订阅的模式,在我看来实实在在是一个双刃剑, 在提供了强大的扩展性的同时,也把相互之间的代码逻辑隐藏在了深处. 在查看源码的时候阻碍重重, 无法让编辑器进行任何静态分析.</p>
+<p>想要了解更多进阶的插件使用方法, 这边建议还是看一些webpack源码, 里面有很多骚气的写法</p>
+<h2 id="扩展阅读"><a href="#扩展阅读" class="headerlink" title="扩展阅读:"></a>扩展阅读:</h2><p><a href="https://webpack.js.org/api/" target="_blank" rel="noopener">webpack API文档</a></p>
+<p><a href="https://github.com/webpack/webpack" target="_blank" rel="noopener">webpack 项目</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/01/31/深入webpack-插件/" data-id="ck622ctfn0009yerom9dui1rg" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2019/12/20/深入webpack-tapable篇/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">深入webpack-tapable篇</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/webpack/" style="font-size: 10px;">webpack</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/01/31/深入webpack-插件/">深入webpack-插件</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/20/深入webpack-tapable篇/">深入webpack-tapable篇</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/22/前端N面-elm-lang/">前端N面-elm-lang</a>
+          </li>
+        
+          <li>
+            <a href="/2019/10/25/初识Svelte/">初识Svelte</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/29/10分钟上手ast/">10分钟上手ast</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
