@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>如何设计一个插件系统 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前言前端的日常开发, 离不开众多由社区提供的第三方library, 从创建到项目打包再到代码的运行时统统都少不了它们的身影. 我们再使用他们的时候由于不同的业务需求,有时候需要对他们进行一些修改. 而设计优秀的的library通常都有一些方式对使用者提供扩展的能力, 这种提供扩展能力的方法通常叫做插件 说到插件大家应该都不陌生, 几乎再日常开发中能用到形形色色的插件, 比如webpack的plug">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何设计一个插件系统">
+<meta property="og:url" content="http://yoursite.com/2020/03/29/如何设计一个插件系统/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="前言前端的日常开发, 离不开众多由社区提供的第三方library, 从创建到项目打包再到代码的运行时统统都少不了它们的身影. 我们再使用他们的时候由于不同的业务需求,有时候需要对他们进行一些修改. 而设计优秀的的library通常都有一些方式对使用者提供扩展的能力, 这种提供扩展能力的方法通常叫做插件 说到插件大家应该都不陌生, 几乎再日常开发中能用到形形色色的插件, 比如webpack的plug">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-03-31T02:51:06.168Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="如何设计一个插件系统">
+<meta name="twitter:description" content="前言前端的日常开发, 离不开众多由社区提供的第三方library, 从创建到项目打包再到代码的运行时统统都少不了它们的身影. 我们再使用他们的时候由于不同的业务需求,有时候需要对他们进行一些修改. 而设计优秀的的library通常都有一些方式对使用者提供扩展的能力, 这种提供扩展能力的方法通常叫做插件 说到插件大家应该都不陌生, 几乎再日常开发中能用到形形色色的插件, 比如webpack的plug">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-如何设计一个插件系统" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/29/如何设计一个插件系统/" class="article-date">
+  <time datetime="2020-03-29T12:02:23.000Z" itemprop="datePublished">2020-03-29</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      如何设计一个插件系统
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前端的日常开发, 离不开众多由社区提供的第三方library, 从创建到项目打包再到代码的运行时统统都少不了它们的身影. 我们再使用他们的时候由于不同的业务需求,有时候需要对他们进行一些修改. 而设计优秀的的library通常都有一些方式对使用者提供扩展的能力, 这种提供扩展能力的方法通常叫做插件</p>
+<p>说到插件大家应该都不陌生, 几乎再日常开发中能用到形形色色的插件, 比如webpack的plugin, babel的plugin, 或者是eslint的plugin, 又或者是vue的plugin,甚至是很多coder都在使用的vscode的extend等等, 数不胜数. 那么这些优秀的项目的扩展体系都是如何设计的? 他们又为什么这么设计? 我们能从这当中学习到什么? 接下来我将从一个简单的小功能作为例子,以一个library开发者的角度来考虑, 一个插件系统应该如何设计.</p>
+<h2 id="起步"><a href="#起步" class="headerlink" title="起步"></a>起步</h2><p>一下是一个非常简单功能例子, 就叫他miniLibrary吧! 它的执行顺序十分简单: 输入数据 -&gt; 数据处理 -&gt; 渲染数据:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DataProcessRender</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>() &#123;</span><br><span class="line">    <span class="keyword">this</span>.state = &#123;&#125;;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  process(a, b) &#123;</span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  apply(a, b, targetDom) &#123;</span><br><span class="line">    <span class="keyword">this</span>.state &#123;</span><br><span class="line">      a,</span><br><span class="line">      b,</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">this</span>.targetDom = targetDom;</span><br><span class="line">    <span class="keyword">this</span>.render();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="built_in">document</span>.querySelector(<span class="keyword">this</span>.state.targetDom).innerHtml = process(<span class="keyword">this</span>.state.a, <span class="keyword">this</span>.state.b);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>调用的方法:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> render = <span class="keyword">new</span> DateProcessRender()</span><br><span class="line">render.apply(<span class="string">'hello'</span>, <span class="string">' world!!'</span>, <span class="string">'#app'</span>);</span><br></pre></td></tr></table></figure></p>
+<p>显然目前看来, 这个library不仅很简单, 而且根本没有任何扩展可言, 除了能够修改<code>apply</code>方法的参数以外, 我们什么也做不了, 那么如果我们想给他增加扩展能力,我们应该怎么办呢?</p>
+<h2 id="插件的引入"><a href="#插件的引入" class="headerlink" title="插件的引入"></a>插件的引入</h2><p>首先我们需要设计一个插件引用的方式, 插件的引入一般有两种方法, 一种是通过配置声明的方式引入, 比如webpack, babel都是这样的, 使用的是它们的config文件来引入:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  plugin: [<span class="string">'upperCase-param'</span>, <span class="string">'default-render'</span>],</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>另一种是vue这种调用式的加载方式:<br> <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Vue.use(xxx)</span><br></pre></td></tr></table></figure></p>
+<p>实际上第一个和第二个者没有本质区别, 最后还是会已第二种的形式对插件进行引入,那么既然两者实际上都一样, 那么我们就需要自己去实现一个插件的加载器功能</p>
+<p>插件加载器一般分成插件的加载和插件的调用两个部分, 插件的加载很简单, 无非就是一个方法把插件注入到Library的内部, 方便随时调用, 但是插件的调用确非诚的依赖插件系统的本身设计, 所以我们我们先看看插件系统通常都有哪些把!</p>
+<h2 id="常见插件系统分类"><a href="#常见插件系统分类" class="headerlink" title="常见插件系统分类"></a>常见插件系统分类</h2><p>通常插件系统的分类有: </p>
+<ul>
+<li>事件钩子型 </li>
+<li>pipeline的流式调用型</li>
+<li>获取实例型</li>
+</ul>
+<p>那么下面我们分别按三种方式来对我们的这个这个miniLibrary进行插件化吧!</p>
+<h2 id="事件钩子型"><a href="#事件钩子型" class="headerlink" title="事件钩子型"></a>事件钩子型</h2><p><em>使用钩子插件系统的Library有很多, <code>webpack</code> <code>babel</code>都是</em></p>
+<p>从代码上看, 程序执行有几个主要的运行阶段: <code>apply</code> <code>process</code> <code>render</code> 我们只需要在这几个地方增加生命周期函数, 就可以吧把扩展的能力给到外面了,而你需要定义的就是每个钩子函数能拿到什么参数</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DataProcessRender</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>() &#123;</span><br><span class="line">    <span class="keyword">this</span>.state = &#123;&#125;;</span><br><span class="line">    <span class="keyword">this</span>.plugin = <span class="literal">null</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  process(a, b) &#123;</span><br><span class="line">    <span class="comment">// 增加process钩子, 用于增加处理结果的扩展能力</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.plugin?.process?.(a, b) || a + b;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  apply(a, b, targetDom) &#123;</span><br><span class="line">    <span class="comment">// apply钩子, 可以扩展初始化数据</span></span><br><span class="line">    <span class="keyword">const</span> [_a, _b, _targetDom] = <span class="keyword">this</span>.plugin?.onApply?.(a, b, targetDom);</span><br><span class="line">    <span class="keyword">this</span>.state &#123;</span><br><span class="line">      a: _a,</span><br><span class="line">      b: _b,</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">this</span>.targetDom = _targetDom;</span><br><span class="line">    <span class="keyword">this</span>.render();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="comment">// runder钩子, 用于修改render的节点</span></span><br><span class="line">    <span class="keyword">const</span> dom = <span class="keyword">this</span>.plugin?.onRender?.(<span class="built_in">document</span>.querySelector(<span class="keyword">this</span>.state.targetDom), <span class="keyword">this</span>.targetDom);</span><br><span class="line">    dom.innerHtml = process(<span class="keyword">this</span>.state.a, <span class="keyword">this</span>.state.b);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  use(plugin) &#123;</span><br><span class="line">    <span class="keyword">this</span>.plugin = plugin;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>调用的方法:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> plugin = &#123;</span><br><span class="line">  onApply: <span class="function">(<span class="params">a ,b ,targetDom</span>) =&gt;</span> [a.toUpperCase(), b.toUpperCase(), targetDom];</span><br><span class="line">  onProcess: <span class="function">(<span class="params">a, b</span>) =&gt;</span> a + <span class="string">' '</span> + b + <span class="string">' some extend text'</span>;</span><br><span class="line">  onRender: <span class="function">(<span class="params">dom</span>) =&gt;</span> dom || <span class="built_in">document</span>.querySelector(<span class="string">'#defaultDom'</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> render = <span class="keyword">new</span> DateProcessRender()</span><br><span class="line">render.use(plugin);</span><br><span class="line">render.apply(<span class="string">'hello'</span>, <span class="string">' world!!'</span>, <span class="string">'#app'</span>); <span class="comment">// HELLO WORLD!! some extend text</span></span><br></pre></td></tr></table></figure></p>
+<p>以上这种是使通过不同的周期函数来把新的逻辑值入到对应的阶段, 再不同的阶段对数据做不同程度的修改, 这看上去是不是很像写react组件?实际上你也可以吧每一个react的component看成react的插件, 而React只是一个调用器</p>
+<p>这种设计插件的方式属于典型的声明式的编程, 代码的可读性比较强, 很容易再阅读插件源码的时候搞清楚来龙去脉, 并且对插件的能力做出了有效的控制. 不过对插件能力的控制试一把双刃剑, 及减少了不良插件对library的影响, 也同时代表插件的扩展能力没有那么强大</p>
+<h2 id="pipeline的流式调用型"><a href="#pipeline的流式调用型" class="headerlink" title="pipeline的流式调用型"></a>pipeline的流式调用型</h2><p><em>使用pipeline的方式来进行扩展, 典型的应用有webpack loader 和 express的中间件.</em></p>
+<p>一次调用一个plugin, 以类似流水线的方式击鼓传花对数据进行操作, 最后对数据做出响应的扩展方案, 一个个关联看似不大的插件, 就这么组合出一个强大的功能</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DataProcessRender</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>() &#123;</span><br><span class="line">    <span class="keyword">this</span>.state = &#123;&#125;;</span><br><span class="line">    <span class="keyword">this</span>.plugins = []; </span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  apply(a, b, targetDom) &#123;</span><br><span class="line">    <span class="keyword">this</span>.state &#123;</span><br><span class="line">      a,</span><br><span class="line">      b,</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">this</span>.targetDom = targetDom;</span><br><span class="line">    run();</span><br><span class="line">  &#125;</span><br><span class="line">  process() &#123;</span><br><span class="line">    data.result = data.a + <span class="string">''</span> + data.b; </span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="built_in">document</span>.querySelector(<span class="keyword">this</span>.state.targetDom).innerHtml(<span class="keyword">this</span>.state.result)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  run() &#123;</span><br><span class="line">    <span class="keyword">this</span>.process();</span><br><span class="line">    <span class="keyword">let</span> index = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">const</span> context = &#123;</span><br><span class="line">      data: <span class="keyword">this</span>.state;</span><br><span class="line">      targetDom: <span class="keyword">this</span>.targetDom;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 这里只支持了同步的调用</span></span><br><span class="line">    <span class="keyword">const</span> next = <span class="function"><span class="params">()</span> =&gt;</span> plugins.length &lt; index + <span class="number">1</span> ? <span class="keyword">this</span>.plugins[index](context, next);</span><br><span class="line">    <span class="comment">// 依次调用插件, 进行数据处理</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.plugins.length) &#123;</span><br><span class="line">      <span class="keyword">this</span>.plugins[index](context, next);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">this</span>.render();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  use(plugin) &#123;</span><br><span class="line">    <span class="keyword">this</span>.plugins.push(plugin);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>调用的方法:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> pluginA = <span class="function">(<span class="params">context, next</span>) =&gt;</span>  &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; data &#125; = context;</span><br><span class="line">  data.a = data.a.toUpperCase(); </span><br><span class="line">  data.b = data.a.toUpperCase(); </span><br><span class="line">  next()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> pluginB = <span class="function">(<span class="params">context, next</span>) =&gt;</span>  &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; data &#125; = context;</span><br><span class="line">  data.result =  data.a + <span class="string">' '</span> + dat.b + <span class="string">' some extend text'</span>;</span><br><span class="line">  next()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> pluginC = <span class="function">(<span class="params">context, next</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (!<span class="built_in">document</span>.querySelector(contest.targetDom)) &#123;</span><br><span class="line">    context = <span class="string">'#defaultDom'</span>; </span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> render = <span class="keyword">new</span> DateProcessRender()</span><br><span class="line"><span class="comment">// 注册</span></span><br><span class="line">render.use(pluginA);</span><br><span class="line">render.use(pluginB);</span><br><span class="line">render.use(pluginC);</span><br><span class="line">render.apply(<span class="string">'hello'</span>, <span class="string">' world!!'</span>, <span class="string">'#app'</span>); <span class="comment">// HELLO WORLD!! some extend text</span></span><br></pre></td></tr></table></figure></p>
+<p>上面故意多些几个例子是为了让每个插件的职责单一, 实际上这也着这类pipeline插件的特点, 比较容易写出职责单一的插件, 方便在后续的使用中进行有效的组合已经复用. 同时这种方式也能比较好的控制住插件的能力,你只需要把希望插件控制的属性传给他即可</p>
+<h2 id="获取实例型"><a href="#获取实例型" class="headerlink" title="获取实例型"></a>获取实例型</h2><p><em>获取实例的插件系统也有很多Library在使用, <code>jQuery</code> <code>Vue</code></em><br>获取实例的方式, 可以让插件直接拿到Library的实例, 也就以为这他能拿到几乎所有的数据, 和直接改源码效果差不多, 非常的强大粗暴<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DataProcessRender</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>() &#123;</span><br><span class="line">    <span class="keyword">this</span>.state = &#123;&#125;;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  process(a, b) &#123;</span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  apply(a, b, targetDom) &#123;</span><br><span class="line">    <span class="keyword">this</span>.state &#123;</span><br><span class="line">      a,</span><br><span class="line">      b,</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">this</span>.targetDom = targetDom;</span><br><span class="line">    <span class="keyword">this</span>.render();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="built_in">document</span>.querySelector(<span class="keyword">this</span>.state.targetDom).innerHtml = process(<span class="keyword">this</span>.state.a, <span class="keyword">this</span>.state.b);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  use(plugin) &#123;</span><br><span class="line">    plugin(<span class="keyword">this</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>调用的方法:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> plugin(instance) &#123;</span><br><span class="line">  instance.process = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a.toUpperCase() + <span class="string">' '</span> + b.toUpperCase() + <span class="string">' some extend text'</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  instance.render() &#123;</span><br><span class="line">    <span class="keyword">const</span> dom = <span class="built_in">document</span>.querySelector(<span class="keyword">this</span>.state.targetDom) || <span class="built_in">document</span>.querySelector(<span class="string">'#defaultDom'</span>)</span><br><span class="line">    dom.innerHtml = process(<span class="keyword">this</span>.state.a, <span class="keyword">this</span>.state.b);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> render = <span class="keyword">new</span> DateProcessRender()</span><br><span class="line">render.use(pluginA);</span><br><span class="line">render.apply(<span class="string">'hello'</span>, <span class="string">' world!!'</span>, <span class="string">'#app'</span>); <span class="comment">// HELLO WORLD!! some extend text</span></span><br></pre></td></tr></table></figure></p>
+<p>这种方法显然是这三种当中最直接粗暴的策略, 给插件提供了非常非常强大的能力, 用这种方式, 你可以用很多种实现我们需要的功能, 但是强大的能力带给我们的是更多的风险. 我们需要去小心插件产生的副作用以及更陡峭的插件开发学习曲线. 因为你可以获得整个实例的所有数据. 你不仅仅可以读取实例所有数据, 你还可以给实例增加新的方法和属性, 但是这都需要又一个前提, 你对library的源码要了解的足够多, 以防你不小心覆盖了library的原生方法和属性导致了未知的错误</p>
+<p>同时虽然有很好的扩展能力, 但是多个插件之间非常不容易相互配合, 并且插件的编写没什么解构调理, 让阅读代码上让人感到吃力</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>首先得说明一下, 上面的例子都非常的简陋, 只是为了说明概念而设计的, 实际上的正规项目, 这些方案会复杂很多, 这里仅仅作为抛砖引玉.</p>
+<p>那么问题来了, 以上三种插件模式到底哪一种好? 在我看来他们各有各的特点, 没有办法说出具体哪个好, 只能是各有千秋, 以及能力上的取舍而已, 实际上社区里的各大Library也并非是同时只在使用一个模式, 他们往往是相互使用的, 可能同时存在及使用钩子, 又使用继承, 既使用继承, 又使用pipeline. 比如webpack,他就是把这三种方式进行了融合, 感兴趣的同学可以看我之前的博文.</p>
+<p>回到开头的问题上来, 我们能从这些插件系统模式上学到什么? 我觉得是让一个个看似黑箱的Library更加透明, 让写一个插件感觉并没有那么云里雾里, 让我们在写代码的时候能够知其然也能知其所以然.</p>
+<h2 id="银弹"><a href="#银弹" class="headerlink" title="银弹?"></a>银弹?</h2><p>插件系统的设计有没有银弹呢? 我觉得没有, 但是会有一些很好的实践. </p>
+<p>目前很多Library的插件系统做的都十分底层, 并不是简简单单中来做功能扩展的, 而是一个完整的运行架构. 所以的library内置功能都是基于插件来开发的, 比如babel-core 只是做代码到ast再到代码的转换, 大概是这样: <code>(a) =&gt; a</code>, 所有的语法转换都是基于一个个的插件来进行特定语法的转移<br>还有就是webpack的构建运行时, 从构建启动, 到文件生成, 都是一系列的声明周期钩子的调用.几乎95%的打包实现都是由不同的插件来实现的. </p>
+<p>可以吧babel-core webpack-runtime 想象成我们开发使用的react, 所谓的Library功能, 就是我们写的react项目, 可以说功能插件化这是未来大型Library设计趋势, </p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>插件系统应该还有很多其他的方法论, 如果我在之后又看到新鲜的方案, 会第一时间分享出来.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/03/29/如何设计一个插件系统/" data-id="ck8fb1ps2000bxlromavd41p8" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2020/01/31/深入webpack-插件/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">深入webpack-插件</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/webpack/" style="font-size: 10px;">webpack</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/03/29/如何设计一个插件系统/">如何设计一个插件系统</a>
+          </li>
+        
+          <li>
+            <a href="/2020/01/31/深入webpack-插件/">深入webpack-插件</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/20/深入webpack-tapable篇/">深入webpack-tapable篇</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/22/前端N面-elm-lang/">前端N面-elm-lang</a>
+          </li>
+        
+          <li>
+            <a href="/2019/10/25/初识Svelte/">初识Svelte</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
