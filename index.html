@@ -62,6 +62,88 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-你真的知道react-redux是怎么运行的么" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/05/19/你真的知道react-redux是怎么运行的么/" class="article-date">
+  <time datetime="2020-05-19T03:22:37.000Z" itemprop="datePublished">2020-05-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/05/19/你真的知道react-redux是怎么运行的么/">你真的知道react-redux是怎么运行的么</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近我在想状态管理的一些技术, 突然想到, react这种只要一有数据变化就无脑进行reRender的框架, 再引入了redux的全局state后, 到底react-redux做了什么事情? 于是打算看看源码, 了解一下它幕后的故事,<br>由于目前我接触的项目绝大部分还停留在react 15上, 并且为了避免新增的hooks相关的代码干扰, 这次我主要看的是<code>react-redux</code>的5.x版本,毕竟更贴紧业务嘛!</p>
+<p>通常看源码最好带一些问题去看效果比较好, 而我再看代码前, 我有以下几个疑问:</p>
+<ol>
+<li>它是如果进行性能优化的<br>2, 全局state的传递,是通过什么来实现的</li>
+<li>如果使用context来传递store信息, 是如何不被CSU阻断的.(react15还在使用老的context api)</li>
+</ol>
+<h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><p><code>react-redux</code>有两个主要的api <code>Provider</code> <code>connect</code>. 他们俩类似于广播, 一个是广播塔, 一个是收音机, 我们先从广播塔<code>Provider</code>开始吧!</p>
+<p><em>注: 以下的所有源码都被简化, 方便理解</em></p>
+<h2 id="Provider"><a href="#Provider" class="headerlink" title="Provider"></a>Provider</h2><p>我们先简单看一下用法, 方便对照调用和实现:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> store = createStore();</span><br><span class="line"> ReactDOM.render(</span><br><span class="line">   <span class="comment">// 传递 全局状态到provider</span></span><br><span class="line">   &lt;Provider store=&#123;store&#125;&gt;</span><br><span class="line">     &lt;App /&gt;</span><br><span class="line">   &lt;<span class="regexp">/Provider&gt;,</span></span><br><span class="line"><span class="regexp">   document.getElementById('root')</span></span><br><span class="line"><span class="regexp"> )</span></span><br></pre></td></tr></table></figure>
+<p>ok,调用很简单, 让我们直接进入代码, 显然<code>react-redux</code>确实是使用context api进行全局store的传递的, 通过Provider从根组件传递了两个属性:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Provider</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">  getChildContext() &#123;</span><br><span class="line">    <span class="comment">// 添加了两个context属性, 一个store, 一个storeSubscription</span></span><br><span class="line">    <span class="keyword">return</span> &#123; <span class="attr">store</span>: <span class="keyword">this</span>.store, <span class="attr">storeSubscription</span>: <span class="literal">null</span> &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">constructor</span>(props, context) &#123;</span><br><span class="line">    <span class="keyword">super</span>(props, context)</span><br><span class="line">    <span class="keyword">this</span>.store = props.store;</span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看出来 <code>Provider</code>只做了很少的事情, 就是把redux的store往下传递, 而这里有一个<code>storeSubscription</code>只是做了一个<code>null</code>的赋值, 那么这个属性到底是干什么的呢? 我们先卖个关子, 接着往下看</p>
+<h2 id="connect"><a href="#connect" class="headerlink" title="connect"></a>connect</h2><p>上面说的<code>Provider</code>像是广播塔, 那么收音机<code>connect</code>它的调用方式我们也来回顾一下, 方便后面对照<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">mapStateToProps</span>(<span class="params">state</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> &#123; <span class="attr">todos</span>: state.todos &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">mapDispatchToProps</span>(<span class="params">dispatch</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> &#123; <span class="attr">actions</span>: bindActionCreators(actionCreators, dispatch) &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 最简单的调用, connect是一个高级函数的科里化, 第一次调用传入对应的mapToProps</span></span><br><span class="line"><span class="comment">// 方法, 第二次调用传入需要包裹的组件</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> connect(mapStateToProps, mapDispatchToProps)(TodoApp)</span><br></pre></td></tr></table></figure></p>
+<p>通过阅读源码,我发现connect的整个功能被分成了两个部分:</p>
+<ol>
+<li>提取需要的stateProps, 注入被包裹的组件, 并做有效的缓存和性能优化</li>
+<li>通知全局state状态改变</li>
+</ol>
+<h4 id="提取需要的stateProps"><a href="#提取需要的stateProps" class="headerlink" title="提取需要的stateProps"></a>提取需要的stateProps</h4><p>connect是一个会大规模使用的公共组件, 其性能一定是倍受关注的, 对于react, 除了普通的代码执行层面的优化, 最有效的优化无疑是<code>componentShouldUpdate</code>了, 因为即使有virtue Dom的存在, 依然不可避免的需要走完render函数, 走完diff算法, 而<code>componentShouldUpdate</code>则异常的直接, 只要你返回的是false, 就直接不做后面的所有事情, 无需render, 直接复用之前的元素.</p>
+<p>那么如何判断我们的connect是否需要渲染呢?</p>
+<ol>
+<li>组件本身的props有变化</li>
+<li>全局state有变化</li>
+</ol>
+<p>如上, 组件本身的props,我们是可以很容易拿到的, 任何一个有变化, 都应该reRender, 但是全局State变化, 我们就不一定都需要reRender了, 这个时候, 我们需要依赖的实际上是传入给connect的 <code>mapStateToProps</code> <code>mapDispatchToProps</code>, 他们两个都类似于选择器. 我只需要确认这两个函数的返回值是否有变化, 就可以确认我是否需要reRender, 因为她们的返回值, 最后都会作用下面组件的props上</p>
+<h6 id="创建一个selector"><a href="#创建一个selector" class="headerlink" title="创建一个selector"></a>创建一个selector</h6><p>所以最后, 最好结果是组合 <code>mapStateToProps</code> <code>mapDispatchToProps</code> 这些函数, 最后返回一个结果对象, 我们只要判断这个结果对象前后两次是否相同, 就可以判断是否需要reRender, 大概是这样:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> stateA = &#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">2</span>, <span class="attr">c</span>: <span class="number">3</span>, <span class="attr">d</span>: &#123; <span class="attr">aa</span>: <span class="number">4</span>, <span class="attr">bb</span>: <span class="number">5</span>&#125;&#125;;</span><br><span class="line"><span class="keyword">const</span> stateB = &#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">999</span>, <span class="attr">c</span>: <span class="number">999</span>, <span class="attr">d</span>: &#123; <span class="attr">aa</span>: <span class="number">4</span>, <span class="attr">bb</span>: <span class="number">5</span>&#125;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">mapStateToProps1</span>(<span class="params">state</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    props1: state.a,</span><br><span class="line">    props2: state.d.bb,</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">mapStateToProps2</span>(<span class="params">state</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    props3: state.a,</span><br><span class="line">    props4: state.d.aa,</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">selector</span>(<span class="params">mapToProps1, mapToProps2, state</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> &#123; ...mapToProps1(state), ...mapToProps2(state)&#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> mergedPropsA = selector(mapStateToProps1, mapStateToProps2, stateA);</span><br><span class="line"><span class="keyword">const</span> mergedPropsB = selector(mapStateToProps1, mapStateToProps2, stateB);</span><br><span class="line"></span><br><span class="line">shadowCompile(mergePropsA, mergePropsB); <span class="comment">// true</span></span><br></pre></td></tr></table></figure></p>
+<p>上面是简单的实例, 来说明我们的 <code>mapStateToProps</code> <code>mapDispatchToProps</code>是如何来发挥选择器作用的.</p>
+<p>下面我们看看<code>react-redux</code>是怎么做的:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这个函数会传入我们再connect传入的 mapStateToProps, mapDispatchToProps, mergeProps, 三个函数, 以及dispatch</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">pureFinalPropsSelectorFactory</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  mapStateToProps,</span></span></span><br><span class="line"><span class="function"><span class="params">  mapDispatchToProps,</span></span></span><br><span class="line"><span class="function"><span class="params">  mergeProps,</span></span></span><br><span class="line"><span class="function"><span class="params">  dispatch,</span></span></span><br><span class="line"><span class="function"><span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 记录是否是第一次执行</span></span><br><span class="line">  <span class="keyword">let</span> hasRunAtLeastOnce = <span class="literal">false</span></span><br><span class="line">  <span class="keyword">let</span> state</span><br><span class="line">  <span class="keyword">let</span> ownProps</span><br><span class="line">  <span class="keyword">let</span> stateProps</span><br><span class="line">  <span class="keyword">let</span> dispatchProps</span><br><span class="line">  <span class="comment">// 本函数最后都会返回这个值, 是一个结果对象, 最后会之间传递到被包裹的组件上</span></span><br><span class="line">  <span class="keyword">let</span> mergedProps</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 首次执行, 计算props, 并生成缓存</span></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">handleFirstCall</span>(<span class="params">firstState, firstOwnProps</span>) </span>&#123;</span><br><span class="line">    state = firstState</span><br><span class="line">    ownProps = firstOwnProps</span><br><span class="line">    stateProps = mapStateToProps(state, ownProps)</span><br><span class="line">    dispatchProps = mapDispatchToProps(dispatch, ownProps)</span><br><span class="line">    mergedProps = mergeProps(stateProps, dispatchProps, ownProps)</span><br><span class="line">    <span class="comment">// 切换标志位</span></span><br><span class="line">    hasRunAtLeastOnce = <span class="literal">true</span></span><br><span class="line">    <span class="keyword">return</span> mergedProps</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">handleNewPropsAndNewState</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    stateProps = mapStateToProps(state, ownProps)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mapDispatchToProps.dependsOnOwnProps)</span><br><span class="line">      dispatchProps = mapDispatchToProps(dispatch, ownProps)</span><br><span class="line"></span><br><span class="line">    mergedProps = mergeProps(stateProps, dispatchProps, ownProps)</span><br><span class="line">    <span class="keyword">return</span> mergedProps</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">handleNewProps</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (mapStateToProps.dependsOnOwnProps)</span><br><span class="line">      stateProps = mapStateToProps(state, ownProps)</span><br><span class="line">    <span class="keyword">if</span> (mapDispatchToProps.dependsOnOwnProps)</span><br><span class="line">      dispatchProps = mapDispatchToProps(dispatch, ownProps)</span><br><span class="line">    mergedProps = mergeProps(stateProps, dispatchProps, ownProps)</span><br><span class="line">    <span class="keyword">return</span> mergedProps</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">handleNewState</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> nextStateProps = mapStateToProps(state, ownProps)</span><br><span class="line">    <span class="keyword">const</span> statePropsChanged = !areStatePropsEqual(nextStateProps, stateProps)</span><br><span class="line">    stateProps = nextStateProps</span><br><span class="line">    <span class="keyword">if</span> (statePropsChanged)</span><br><span class="line">      mergedProps = mergeProps(stateProps, dispatchProps, ownProps)</span><br><span class="line">    <span class="keyword">return</span> mergedProps</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 首次执行后都走这个函数</span></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">handleSubsequentCalls</span>(<span class="params">nextState, nextOwnProps</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 看组件自己接受的props是否相同</span></span><br><span class="line">    <span class="keyword">const</span> propsChanged = !areOwnPropsEqual(nextOwnProps, ownProps)</span><br><span class="line">    <span class="comment">// 判断收到的全局state是否相等, 上面两种方法都这是做浅比较</span></span><br><span class="line">    <span class="keyword">const</span> stateChanged = !areStatesEqual(nextState, state)</span><br><span class="line">    state = nextState</span><br><span class="line">    ownProps = nextOwnProps</span><br><span class="line">    <span class="comment">// 根据不同情况, 做不同处理, 最后的结果都是会去处理 mergedProps这个值</span></span><br><span class="line">    <span class="comment">// 如果都相等就原封不动的返回mergedProps</span></span><br><span class="line">    <span class="keyword">if</span> (propsChanged &amp;&amp; stateChanged) <span class="keyword">return</span> handleNewPropsAndNewState()</span><br><span class="line">    <span class="keyword">if</span> (propsChanged) <span class="keyword">return</span> handleNewProps()</span><br><span class="line">    <span class="keyword">if</span> (stateChanged) <span class="keyword">return</span> handleNewState()</span><br><span class="line">    <span class="keyword">return</span> mergedProps</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 入口, 传入的是redux的全局state,和自己本身接受的props</span></span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="title">selector</span>(<span class="params">nextState, nextOwnProps</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 首次执行 和 之后的执行分别走了不同的函数</span></span><br><span class="line">    <span class="keyword">return</span> hasRunAtLeastOnce</span><br><span class="line">      ? handleSubsequentCalls(nextState, nextOwnProps)</span><br><span class="line">      : handleFirstCall(nextState, nextOwnProps)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面我们看到, connect 生成了一个selector函数, 通过保存 <code>mapStateToProps</code> <code>mapDispatchToProps</code>的返回值,对两次结果进行比较来做优化,如果没变化则直接返回旧值.这样我们在每次调用selector之后,只要两次的返回值相等, 则说明我们并不需要渲染, 那么connectHOC的 <code>componentShouldUpdate</code>就可以返回true了<br>所以只要我们生成了select函数, 剩下只需要关注状态变化, 并渲染就可以了</p>
+<h4 id="state状态改变通知"><a href="#state状态改变通知" class="headerlink" title="state状态改变通知"></a>state状态改变通知</h4><p>再看代码前, 我们先来想一想应该怎样做状态变化的通知.</p>
+<p>一种比较简单的状态通知方式是, 每次store改变, 触发根组件的刷新, 所有的connect都会在reRender的时机通过<code>context</code>取获取最新的全局state, 并通过selector进行属性提取, 最后把对应的props注入组件中</p>
+<p>但是这有一个问题, 首先就是这种方式会在每次store有变化时,进行一次全应用的reRender, 性能可以说是非常差了. 所以要做性能优化, 上一节我们说了, 设计出来的selector是具被这些能力的,只需要使用<br><code>componentShouldUpdate</code>优化, 使用它来判断是否需要对组件进行渲染.</p>
+<p>但是如果我们仔细想一下,有任何一个connectHOC再做过前后stateProps对比后, 发现没有变化, 那么它就会停止了渲染, 这样会发生什么? 无疑, 这会导致 下级的connect<br>没有触发reRender, 从而也就不会触发它获取最新store, 整个数据的传递,再这里就被截断了, 在新的context api出现之前, 这个问题一直是倍受开发者诟病</p>
+<p>上面这种方式状态的更新路径可以见下图;<br><img src="https://moka-sugar.oss-cn-beijing.aliyuncs.com/img/react-redux1.png" alt></p>
+<p>既然有这样的问题, 我们就需要考虑能不能不让所有的connect去直接依赖store的变化? 如果这样,我们应该怎么办?</p>
+<p>我们是不是可以通过嵌套层级进行一级一级的传递, 当顶级的store改变了, 向下一级进行通知, 对应的connect会自动向下一级进行转发, 这样就不再依赖于组件的渲染传递了, 具体的示意图如下:</p>
+<p><img src="https://moka-sugar.oss-cn-beijing.aliyuncs.com/img/2222.png" alt></p>
+<p>实际上<code>react-redux</code>就是这样解决问题的, 每一个connectHOC都是一个订阅者, 同时也是一个发布者, 他们都包含一个<code>subscription</code>对象, 用来订阅上级connect, 并且通知下级connect,接下来上代码:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 对select进行一次包裹, 方便吧一些值保存在这个包裹对象里</span></span><br><span class="line"><span class="comment">// 除了run, 还有props用来记录当前最新的stateProps, 还有shouldComponentUpdate</span></span><br><span class="line"><span class="comment">// 用来记录下次reRender是否应该通过</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">makeSelectorStateful</span>(<span class="params">sourceSelector, store</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> selector = &#123;</span><br><span class="line">    run: <span class="function"><span class="keyword">function</span> <span class="title">runComponentSelector</span>(<span class="params">props</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">const</span> nextProps = sourceSelector(store.getState(), props)</span><br><span class="line">      <span class="keyword">if</span> (nextProps !== selector.props) &#123;</span><br><span class="line">        selector.shouldComponentUpdate = <span class="literal">true</span></span><br><span class="line">        selector.props = nextProps</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> selector</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 真正的connect包裹组件</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Connect</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>(props, context) &#123;</span><br><span class="line">    <span class="keyword">super</span>(props, context)</span><br><span class="line">    <span class="keyword">this</span>.store = context.store</span><br><span class="line">    <span class="keyword">this</span>.initSelector() <span class="comment">// 初始化selector</span></span><br><span class="line">    <span class="keyword">this</span>.initSubscription() <span class="comment">// 初始化订阅器</span></span><br><span class="line">  &#125;</span><br><span class="line">  getChildContext() &#123;</span><br><span class="line">    <span class="comment">// 覆盖上级的context, 这样下级的ConnectHOC就会获取覆盖后的订阅器,</span></span><br><span class="line">    <span class="keyword">return</span> &#123; <span class="attr">storeSubscription</span>: <span class="keyword">this</span>.subscription &#125;  </span><br><span class="line">  &#125;</span><br><span class="line">  componentDidMount() &#123;</span><br><span class="line">    <span class="keyword">this</span>.subscription.trySubscribe()</span><br><span class="line">    <span class="keyword">this</span>.selector.run(<span class="keyword">this</span>.props) <span class="comment">// 计算当前最新的props</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.selector.shouldComponentUpdate) <span class="keyword">this</span>.forceUpdate() <span class="comment">// 如果计算结果有变化就强制刷新</span></span><br><span class="line">  &#125;</span><br><span class="line">  componentWillReceiveProps(nextProps) &#123;</span><br><span class="line">    <span class="keyword">this</span>.selector.run(nextProps) <span class="comment">// 每次获取到新的props都从新进行计算</span></span><br><span class="line">  &#125;</span><br><span class="line">  shouldComponentUpdate() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.selector.shouldComponentUpdate</span><br><span class="line">  &#125;</span><br><span class="line">  initSelector() &#123;</span><br><span class="line">    <span class="comment">// 初始化selector, 这里的selector, 就是我们上面提到的selector, 接受最新的全局State, 和当前组件的props</span></span><br><span class="line">    <span class="keyword">const</span> sourceSelector = selectorFactory(<span class="keyword">this</span>.store.dispatch, selectorFactoryOptions)</span><br><span class="line">    <span class="comment">// 做一个包裹, 用来保存更多信息</span></span><br><span class="line">    <span class="keyword">this</span>.selector = makeSelectorStateful(sourceSelector, <span class="keyword">this</span>.store)</span><br><span class="line">    <span class="comment">// 调用run, 等于直接调用selector, 获取最新的props</span></span><br><span class="line">    <span class="keyword">this</span>.selector.run(<span class="keyword">this</span>.props)</span><br><span class="line">  &#125;</span><br><span class="line">  initSubscription() &#123;</span><br><span class="line">    <span class="keyword">const</span> parentSub =  <span class="keyword">this</span>.context[subscriptionKey] <span class="comment">// 获取上一级的订阅器</span></span><br><span class="line">    <span class="comment">// 再上一级订阅器里注册onStateChange回调, 并生成自己的订阅器</span></span><br><span class="line">    <span class="comment">// 之前卖的关子就在这里, Provider传入的 context.storeSubscription 是null, 因为当 storeSubscription为空的话, connect的会直接到store上进行订阅</span></span><br><span class="line">    <span class="comment">// 否则会在上级connect再context中传入storeSubscription上进行订阅</span></span><br><span class="line">    <span class="comment">// 也就是说, 只有第一级connect会直接订阅store的变化, 其他级别都是直接订阅上级connect的storeSubscription</span></span><br><span class="line">    <span class="keyword">this</span>.subscription = <span class="keyword">new</span> Subscription(<span class="keyword">this</span>.store, parentSub, <span class="keyword">this</span>.onStateChange.bind(<span class="keyword">this</span>))</span><br><span class="line">    <span class="keyword">this</span>.notifyNestedSubs = <span class="keyword">this</span>.subscription.notifyNestedSubs.bind(<span class="keyword">this</span>.subscription)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 这个方法会在每次store有变化时调用</span></span><br><span class="line">  onStateChange() &#123;</span><br><span class="line">    <span class="comment">// 首先是计算props</span></span><br><span class="line">    <span class="keyword">this</span>.selector.run(<span class="keyword">this</span>.props)</span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">this</span>.selector.shouldComponentUpdate) &#123;</span><br><span class="line">      <span class="comment">// 无变动则只通知</span></span><br><span class="line">      <span class="keyword">this</span>.notifyNestedSubs()</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">// 有变动则再下次didupdate的时候进行通知, 我猜测是为了防止一次出发所有变动导致性能卡顿???</span></span><br><span class="line">      <span class="keyword">this</span>.componentDidUpdate = <span class="keyword">this</span>.notifyNestedSubsOnComponentDidUpdate</span><br><span class="line">      <span class="keyword">this</span>.setState(&#123;&#125;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// didUpdate生命周期的实际回调函数, 这么做官方解释也是为了能够减少boolean判断, 提高性能</span></span><br><span class="line">  notifyNestedSubsOnComponentDidUpdate() &#123;</span><br><span class="line">    <span class="keyword">this</span>.componentDidUpdate = <span class="literal">undefined</span></span><br><span class="line">    <span class="keyword">this</span>.notifyNestedSubs()</span><br><span class="line">  &#125;</span><br><span class="line">  isSubscribed() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Boolean</span>(<span class="keyword">this</span>.subscription) &amp;&amp; <span class="keyword">this</span>.subscription.isSubscribed()</span><br><span class="line">  &#125;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> selector = <span class="keyword">this</span>.selector</span><br><span class="line">    selector.shouldComponentUpdate = <span class="literal">false</span></span><br><span class="line">    <span class="keyword">return</span> createElement(WrappedComponent,selector.props)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>OK, 看完这些, 我们基本上就把<code>react-redux</code>的核心理念都看完了, </p>
+<ol>
+<li>首先是生成一个selector函数, 截取需要数据进行前后对比, 确定是否rerender</li>
+<li>为了保证不被<code>componentShouldUpdate</code>截断, 使用发布订阅模式来对子级<code>connect</code>进行通知</li>
+</ol>
+<p>上述的代码都是为了方便阅读而做了大量的删减, 只保存了最关键的代码, 实际上还有一些报错处理, 以及兼容处理, 比如如何应对一些react16已经不在安全的生命周期兼容,<br>ssr场景兼容, 以及更多的可扩展性的设计, 对了, 还有很多高阶函数的骚气调用, 看得我眼花缭乱. 总体来说, 收获不少, 能更深刻的理解设计者, 了解到他们代码之下的思考.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/05/19/你真的知道react-redux是怎么运行的么/" data-id="ckade5sh900091mroa85rtz4y" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-如何设计一个简单的模块系统" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2020/04/27/如何设计一个简单的模块系统/" class="article-date">
@@ -142,7 +224,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/27/如何设计一个简单的模块系统/" data-id="ck9ik1ty2000bwhroxhlsr1d2" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/04/27/如何设计一个简单的模块系统/" data-id="ckade5sh700071mro7zq6v4va" class="article-share-link">Share</a>
       
       
     </footer>
@@ -216,7 +298,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/29/如何设计一个插件系统/" data-id="ck9ik1ty0000awhrohgba5ie8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/29/如何设计一个插件系统/" data-id="ckade5shc000b1mro9lvnglek" class="article-share-link">Share</a>
       
       
     </footer>
@@ -280,7 +362,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/01/31/深入webpack-插件/" data-id="ck9ik1ty5000dwhrosfuosgnw" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/01/31/深入webpack-插件/" data-id="ckade5she000d1mrojl0x4om7" class="article-share-link">Share</a>
       
       
     </footer>
@@ -360,7 +442,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/20/深入webpack-tapable篇/" data-id="ck9ik1ty3000cwhronp6qs6l2" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/12/20/深入webpack-tapable篇/" data-id="ckade5shg000e1mro2fcre4c3" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/webpack/">webpack</a></li></ul>
@@ -451,7 +533,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/11/22/前端N面-elm-lang/" data-id="ck9ik1txz0009whrowexupbsu" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/11/22/前端N面-elm-lang/" data-id="ckade5shb000a1mroyjxnswq7" class="article-share-link">Share</a>
       
       
     </footer>
@@ -514,7 +596,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/10/25/初识Svelte/" data-id="ck9ik1txx0007whros6r0h6xs" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/10/25/初识Svelte/" data-id="ckade5shd000c1mroby2h9e1a" class="article-share-link">Share</a>
       
       
     </footer>
@@ -575,7 +657,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/08/29/10分钟上手ast/" data-id="ck9ik1txs0003whro2vqsw2st" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/08/29/10分钟上手ast/" data-id="ckade5sgz00011mro1whm9zou" class="article-share-link">Share</a>
       
       
     </footer>
@@ -621,7 +703,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/16/react-router4学习(1)/" data-id="ck9ik1txv0005whrokja223t8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/16/react-router4学习(1)/" data-id="ckade5sh500051mrod0ijsae1" class="article-share-link">Share</a>
       
       
     </footer>
@@ -664,7 +746,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/09/2019学习计划/" data-id="ck9ik1txo0001whronslfu5qr" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/09/2019学习计划/" data-id="ckade5sh300031mroydcdba6y" class="article-share-link">Share</a>
       
       
     </footer>
@@ -706,7 +788,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
     </div>
   </div>
 
@@ -717,6 +799,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2020/05/19/你真的知道react-redux是怎么运行的么/">你真的知道react-redux是怎么运行的么</a>
+          </li>
         
           <li>
             <a href="/2020/04/27/如何设计一个简单的模块系统/">如何设计一个简单的模块系统</a>
@@ -732,10 +818,6 @@
         
           <li>
             <a href="/2019/12/20/深入webpack-tapable篇/">深入webpack-tapable篇</a>
-          </li>
-        
-          <li>
-            <a href="/2019/11/22/前端N面-elm-lang/">前端N面-elm-lang</a>
           </li>
         
       </ul>
