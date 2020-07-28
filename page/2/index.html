@@ -62,6 +62,52 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-react-router4学习(1)" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/05/16/react-router4学习(1)/" class="article-date">
+  <time datetime="2019-05-16T15:16:58.000Z" itemprop="datePublished">2019-05-16</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/05/16/react-router4学习(1)/">react-router4学习</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>#前言 </p>
+<p>react-router4出来有很久了, 一直没有使用过, 最近计划学习一下react16以及相关的生态库, 就打算从react-router4开始了, 毕竟现在已经是大行其道了, 我会从react-router3 和roact-router4的异同来慢慢说明两者的区别</p>
+<p>#声明方式</p>
+<p>react-router3的路由声明通常是在一个文件里声明完整的路由关系,比如:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;Router&gt;</span><br><span class="line">  &lt;Route path=<span class="string">"/"</span> component=&#123;App&#125;&gt;</span><br><span class="line">    &lt;Route path=<span class="string">"accounts"</span> component=&#123;Accounts&#125;/&gt;</span><br><span class="line">    &lt;Route path=<span class="string">"statements"</span> component=&#123;Statements&#125;&gt;</span><br><span class="line">      &lt;Route path=<span class="string">"info"</span> component=&#123;Info&#125;&gt;</span><br><span class="line">    &lt;<span class="regexp">/Router&gt;</span></span><br><span class="line"><span class="regexp">  &lt;/</span>Route&gt;</span><br><span class="line">&lt;<span class="regexp">/Router&gt;</span></span><br></pre></td></tr></table></figure>
+<p>路由相关组件之间的调用非常隐晦, 比如<code>App</code>为下级路由组件<code>Accounts</code>传递值是这样的:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">App</span> <span class="title">extend</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      &lt;div&gt;</span><br><span class="line">        &#123;...props.children&#125; <span class="comment">// 这句就是对Accounts的调用</span></span><br><span class="line">      &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">    )</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>从上面可以看出来, 从代码逻辑上,完全看不出<code>App</code>调用了<code>Accounts</code>,这导致了代码的可读性非常的差.</p>
+<p>那么react-router4的路由声明变成了什么样子呢?<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">App</span> <span class="title">extend</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      &lt;div&gt;</span><br><span class="line">        &lt;Route path=<span class="string">"accounts"</span> component=&#123;Accounts&#125;/&gt;</span><br><span class="line">      &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">    )</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>变成了这样!是不是一目了然?现在变成了那里有路由需求, 那里声明路由的方式.熟悉<code>vue</code>的同学应该已经看出来,这种写法和<code>vue-router</code>的调用方式很相似,比较简单明了. 其实我第一次用<code>react-router4</code>的时候由于没看文档,还被坑了一次. </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/05/16/react-router4学习(1)/" data-id="ckd5eq8eu0006tproyaeecvup" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-2019学习计划" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/05/09/2019学习计划/" class="article-date">
@@ -95,7 +141,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/09/2019学习计划/" data-id="ckc1iz3tw0003j8s6ctp77zb9" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/09/2019学习计划/" data-id="ckd5eq8er0004tprouh33ymoq" class="article-share-link">Share</a>
       
       
     </footer>
@@ -142,7 +188,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
     </div>
   </div>
 
@@ -153,6 +199,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2020/07/28/理解前端依赖/">理解前端依赖</a>
+          </li>
         
           <li>
             <a href="/2020/06/30/理解DSL/">理解DSL</a>
@@ -168,10 +218,6 @@
         
           <li>
             <a href="/2020/03/29/如何设计一个插件系统/">如何设计一个插件系统</a>
-          </li>
-        
-          <li>
-            <a href="/2020/01/31/深入webpack-插件/">深入webpack-插件</a>
           </li>
         
       </ul>

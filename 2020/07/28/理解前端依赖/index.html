@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>理解前端依赖 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="现代的前端开发, 每个前端工程师都需要自己的项目添加第三方依赖, 也会自己开发的第三方库进行对外发布, 而承担这些功能的我们叫它包管理器, 世面上常见的包管理器有bower npm yarn, 这三个里npm是使用最为广泛的. 因为前端依赖是允许再同一个项目中可能在不同层级的依赖上使用同一个第三方依赖的多个版本, 所以前端的依赖管理逻辑往往让人理不清. 这本质的原因在于当允许依赖树中出现多个相同的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="理解前端依赖">
+<meta property="og:url" content="http://yoursite.com/2020/07/28/理解前端依赖/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="现代的前端开发, 每个前端工程师都需要自己的项目添加第三方依赖, 也会自己开发的第三方库进行对外发布, 而承担这些功能的我们叫它包管理器, 世面上常见的包管理器有bower npm yarn, 这三个里npm是使用最为广泛的. 因为前端依赖是允许再同一个项目中可能在不同层级的依赖上使用同一个第三方依赖的多个版本, 所以前端的依赖管理逻辑往往让人理不清. 这本质的原因在于当允许依赖树中出现多个相同的">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://moka-sugar.oss-cn-beijing.aliyuncs.com/img/dedupe.png">
+<meta property="og:updated_time" content="2020-07-28T03:53:49.130Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="理解前端依赖">
+<meta name="twitter:description" content="现代的前端开发, 每个前端工程师都需要自己的项目添加第三方依赖, 也会自己开发的第三方库进行对外发布, 而承担这些功能的我们叫它包管理器, 世面上常见的包管理器有bower npm yarn, 这三个里npm是使用最为广泛的. 因为前端依赖是允许再同一个项目中可能在不同层级的依赖上使用同一个第三方依赖的多个版本, 所以前端的依赖管理逻辑往往让人理不清. 这本质的原因在于当允许依赖树中出现多个相同的">
+<meta name="twitter:image" content="https://moka-sugar.oss-cn-beijing.aliyuncs.com/img/dedupe.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-理解前端依赖" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/07/28/理解前端依赖/" class="article-date">
+  <time datetime="2020-07-28T03:20:00.000Z" itemprop="datePublished">2020-07-28</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      理解前端依赖
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>现代的前端开发, 每个前端工程师都需要自己的项目添加第三方依赖, 也会自己开发的第三方库进行对外发布, 而承担这些功能的我们叫它包管理器, 世面上常见的包管理器有<code>bower</code> <code>npm</code> <code>yarn</code>, 这三个里<code>npm</code>是使用最为广泛的.</p>
+<p>因为前端依赖是允许再同一个项目中可能在不同层级的依赖上使用同一个第三方依赖的多个版本, 所以前端的依赖管理逻辑往往让人理不清. 这本质的原因在于当允许依赖树中出现多个相同的依赖, 就会出现’环’这种东西, 所以实际上依赖应该被解析成<code>graph</code> 而不是 <code>tree</code>, 但是在文件系统确只能表达<code>tree</code>, 因此在不同的<code>npm</code>版本, 对于依赖的解析也有不同的方式, 我们下面提到的均是以v6版本为基础的.</p>
+<h2 id="npm是如何解析项目依赖的"><a href="#npm是如何解析项目依赖的" class="headerlink" title="npm是如何解析项目依赖的"></a>npm是如何解析项目依赖的</h2><p>在前端项目里, 基本上都能看到一个名叫<code>package.json</code>的文件, 里面有一部分重要的字段, 比如<code>dependencies</code> <code>devDependencies</code> 等等,都是是用来记录项目依赖的, 相关字段的区别无非是设置依赖的安装条件而已, 具体的可以查看<a href="https://docs.npmjs.com/files/package.json#dependencies" target="_blank" rel="noopener">官方文档</a>, 这里不再赘述. 项目里的所有依赖都是有版本标记的, 他们都使用同一种版本命名法<a href="https://semver.org/" target="_blank" rel="noopener">Semantic</a>, 这可以让<code>npm</code>很好的对相同第三方库的版本进行区分和排序, 这也是能够实现一个依赖树中出现多个相同第三方库的基础.</p>
+<p>我们知道, 前端项目不仅仅有<code>package.json</code>这个文件, 还有一个目录叫做<code>node_modules</code>. ‘package.json’是用来描述我们的项目依赖, 而<code>node_modules</code>则是用来保存对应的第三方依赖包的, 那么npm是如何通过<code>package.json</code>来构建<code>node_modules</code>文件夹的呢?</p>
+<p>我还是直接上一个例子吧!</p>
+<p>下面是一个项目<code>mage</code>的一个依赖图:<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mage</span><br><span class="line">+-- sugar-design@1.0.0 // 直接依赖</span><br><span class="line">    +-- react@16.2.0 </span><br><span class="line">    +-- classname@5.0.0</span><br></pre></td></tr></table></figure></p>
+<p>首先, <code>npm</code>会尝试吧所有的依赖扁平化的保存到最顶级的<code>node_modules</code>, 也就是生成下面这样的文件结构:<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mage</span><br><span class="line">+-- node_modules</span><br><span class="line">  +-- sugar-design@1.0.0</span><br><span class="line">  +-- react@16.2.0</span><br><span class="line">  +-- classname@5.0.0</span><br></pre></td></tr></table></figure></p>
+<p>当我们给<code>mage</code>添加一个新的依赖<a href="mailto:react@16.13.1" target="_blank" rel="noopener">react@16.13.1</a>时, <code>mage</code>的依赖图会变成这样:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mage</span><br><span class="line">+-- react@16.13.1</span><br><span class="line">+-- sugar-design@1.0.0</span><br><span class="line">    +-- react@16.2.0</span><br><span class="line">    +-- classname@5.0.0</span><br></pre></td></tr></table></figure>
+<p>那么接下来<code>node_modules</code>的文件结构会变成怎样呢?</p>
+<ol>
+<li>根据项目的顶级依赖, 顶级<code>node_modules</code>安装<a href="mailto:react@16.13.1" target="_blank" rel="noopener">react@16.13.1</a></li>
+<li>由于顶级<code>node_modules</code>目录已经安装了<a href="mailto:react@16.13.1" target="_blank" rel="noopener">react@16.13.1</a>, 而<code>sugar-design</code>依赖的<code>react</code>版本是16.2.0, 所以只能安装在它内部的<code>node_modules</code>里</li>
+</ol>
+<p>所以文件结构会是这样:<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mage</span><br><span class="line">+-- node_modules</span><br><span class="line">  +-- react@16.13.1</span><br><span class="line">  +-- sugar-design@1.0.0</span><br><span class="line">  |   +-- node_modules</span><br><span class="line">  |       +-- react@16.2.0</span><br><span class="line">  +-- classname@5.0.0</span><br></pre></td></tr></table></figure></p>
+<p>ok, 我们继续, 现在我们又为<code>mage</code>增加一个新的依赖<a href="mailto:editor@1.0.0" target="_blank" rel="noopener">editor@1.0.0</a>, 它依赖于<a href="mailto:react@16.2.0" target="_blank" rel="noopener">react@16.2.0</a> 和 <a href="mailto:className@5.0.0" target="_blank" rel="noopener">className@5.0.0</a></p>
+<p>对应的依赖图:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mage</span><br><span class="line">+-- react@16.13.1</span><br><span class="line">+-- sugar-design@1.0.0</span><br><span class="line">|   +-- react@16.2.0</span><br><span class="line">|   +-- classname@5.0.0 </span><br><span class="line">+-- editor@1.0.0</span><br><span class="line">    +-- react@16.2.0</span><br><span class="line">|   +-- classname@5.0.0</span><br></pre></td></tr></table></figure>
+<p>接下来<code>npm</code>再安装依赖的时候会这样做:</p>
+<ul>
+<li>在顶级<code>node_modules</code>上安装<a href="mailto:editor@1.0.0" target="_blank" rel="noopener">editor@1.0.0</a></li>
+<li>由于它依赖的<code>react</code>版本和顶级<code>node_modules</code>的<code>react</code>版本不匹配, 所以在它的内部<code>node_modules</code>里安装<a href="mailto:react@16.2.0" target="_blank" rel="noopener">react@16.2.0</a></li>
+<li>由于它依赖的<code>classname</code>版本和顶级<code>node_modules</code>的<code>classname</code>版本匹配本, 所以不需要再单独安装</li>
+</ul>
+<p>文件结构会是这样:<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mage</span><br><span class="line">+-- node_modules</span><br><span class="line">  +-- react@16.13.1</span><br><span class="line">  +-- sugar-design@1.0.0</span><br><span class="line">  |   +-- node_modules</span><br><span class="line">  |       +-- react@16.2.0</span><br><span class="line">  +-- classname@5.0.0 </span><br><span class="line">  +-- editor@1.0.0</span><br><span class="line">      +-- node_modules</span><br><span class="line">          +-- react@16.2.0</span><br></pre></td></tr></table></figure></p>
+<p>我们看到, 在安装依赖时, 都是优先安装在顶级<code>node_modules</code>上, 如果有已经用相同的第三方库已经安装, 则在子级<code>node_modules</code>上安装, 如果还有, 则以此类推</p>
+<p>最后让我们把<code>sugar-design</code>的版本进行一次升级, 新的版本也同时升级了它的依赖, 把<code>react</code>升级到了<code>16.13.1</code> <code>classname</code> 升级到了 <code>6.0.0</code>, 对应的依赖图是:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mage</span><br><span class="line">+-- react@16.13.1</span><br><span class="line">+-- sugar-design@2.0.0</span><br><span class="line">|   +-- react@16.13.1</span><br><span class="line">|   +-- classname@6.0.0 </span><br><span class="line">+-- editor@1.0.0</span><br><span class="line">    +-- react@16.2.0</span><br><span class="line">|   +-- classname@5.0.0</span><br></pre></td></tr></table></figure>
+<p>接下来会发生:</p>
+<ul>
+<li>由于祖先有相同版本的react, 所以移除了<code>sugar-design</code>内部的<code>react</code></li>
+<li>由于安装顺序原因<code>sugar-design</code>的<a href="mailto:classname@6.0.0" target="_blank" rel="noopener">classname@6.0.0</a>会安装在<code>node_modules</code>根目录上, 所以<code>editor</code>在内部<code>node_modules</code>安装<a href="mailto:classname@5.0.0" target="_blank" rel="noopener">classname@5.0.0</a></li>
+</ul>
+<p>最后的文件结构会是这样:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mage</span><br><span class="line">+-- node_modules</span><br><span class="line">  +-- react@16.13.1</span><br><span class="line">  +-- sugar-design@2.0.0</span><br><span class="line">  +-- classname@6.0.0 </span><br><span class="line">  +-- editor@1.0.0</span><br><span class="line">      +-- node_modules</span><br><span class="line">          +-- react@16.2.0</span><br><span class="line">          +-- classname@5.0.0</span><br></pre></td></tr></table></figure>
+<p>最后的最后, 我们来测试一下变换声明顺序:</p>
+<p>我们把<code>sugar-design</code> 和 <code>editor</code>的声明顺序对调一下:<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mage</span><br><span class="line">+-- react@16.13.1</span><br><span class="line">+-- editor@1.0.0 // 对调了</span><br><span class="line">|   +-- react@16.2.0</span><br><span class="line">|   +-- classname@5.0.0 </span><br><span class="line">+-- sugar-design@2.0.0 // 对调了</span><br><span class="line">    +-- react@16.13.1</span><br><span class="line">    +-- classname@6.0.0</span><br></pre></td></tr></table></figure></p>
+<p>对调后,虽然最后加载的版本没错, 但是生成的文件结构变了:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mage</span><br><span class="line">+-- node_modules</span><br><span class="line">  +-- react@16.13.1</span><br><span class="line">  +-- sugar-design@2.0.0</span><br><span class="line">      +-- node_modules</span><br><span class="line">          +-- classname@6.0.0 // sugar-design 的依赖到了自己的内部</span><br><span class="line">  +-- classname@5.0.0  // editor 的依赖classname到了顶级</span><br><span class="line">  +-- editor@1.0.0</span><br><span class="line">      +-- node_modules</span><br><span class="line">          +-- react@16.2.0</span><br></pre></td></tr></table></figure>
+<p>ok, 例子结束, 我们整理一下上面的例子, 得到一下的结论: </p>
+<ul>
+<li>npm安装依赖时, 会尝试吧所有的依赖扁平化的安装在<code>node_modules</code>根目录</li>
+<li>如果祖先对应的依赖版本不匹配的话, 将在自己的内部<code>node_modules</code>内进行安装, 以此类推</li>
+<li>安装顺序和依赖的声明顺序有关, 所以声明顺序变了, 最后生成的`node_modules’结构可能会不同</li>
+</ul>
+<p>经过上面的饿总结, 相信大家对npm的依赖安装逻辑已经有足够的了解了.</p>
+<p>那么我们想一想, 依赖加载时, 查找的逻辑是什么呢? 其实从上面的依赖安装逻辑已经可以看出来了, 实际上就是’最近原则’, 也就是说先查找自己的<code>node_modules</code>, 没有就依次往上查找上级<code>node_modules</code>, 直到找到为止. 值得注意的是, 在真正调用依赖的时候, 系统并不会去验证版本号, 只要找到就进行加载, 版本号的验证都在安装阶段进行校验的</p>
+<p>虽然了解了安装依赖的逻辑, 但是这对我们日常工作能有什么帮助呢? 毕竟日常当中, 我们往往是引入第三方库, 而不是发布第三方库. 如果我们是一个第三方库的作者, 我们需要在这方面注意什么呢?</p>
+<h2 id="第三方库开发误区"><a href="#第三方库开发误区" class="headerlink" title="第三方库开发误区"></a>第三方库开发误区</h2><p>现在的前端工程, 离不开打包工具, 不管是<code>webpack</code> 还是<code>rollup</code>, 他们的核心理念都是吧多个模块封装到一个模块里.所以在我们开发的时候往往会对<code>package.json</code>內声明的依赖不太重视, 以为只要代码打包, 所有的依赖都已经打入构建好的源码中了, <code>package.json</code>里的东西只会在第三方库内部开发时才会用到, 不会对引用第三方库的人产生什么影响. 实际上这完全是错误的. 因为只要你的第三方库中的<code>package.json</code>声明了<code>dependencies</code>, 那么引入这个第三方的项目就都需要安装它, 虽然项目里确实不会真的引用到这些依赖. </p>
+<p>上面这种情况, 虽然会安装多余的依赖, 但是并不会对项目本身产生多少负面作用.但接下来一个情况, 可能会对项目有重大印象, 并且在做bug排查时, 也可能会遇到很大的困难, 比如(Invalid Hook Call Warning)[<a href="https://reactjs.org/warnings/invalid-hook-call-warning.html]" target="_blank" rel="noopener">https://reactjs.org/warnings/invalid-hook-call-warning.html]</a>.</p>
+<p>首先我们应该理解一个概念, 在开发第三方库时, 应该吧运行时的依赖写在<code>dependencies</code>里.</p>
+<p>如果我们开发的第三方库并不希望再运行时使用自己的依赖, 而是使用宿主的依赖, 比如<code>react</code> <code>classname</code> <code>react-dom</code>, 通常我们会对打包工具的<code>external</code>字段进行配置, 这样打包工具就不会把我们的对应依赖打入构建后的代码里. 这时构建好的第三方库是没对应的依赖的. 但是在其他项目引入我们写第三方库时, 项目打包工具在编译到我们的第三方库时, 由于我们的第三方库没有打包对应的依赖, 所以会去尝试加载我们第三方库的依赖,这时, 打包工具会去查找我们自己写第三方库下面的<code>node_modules</code>是否这些依赖, 如果第三方库里的依赖是使用<code>dependencies</code>来声明的话, 很有可能因为声明的版本和宿主环境的不同导致在内部又多安装了一份依赖, 构建工具最终会把我们自己写的第三方库的依赖也打入最后的项目构建代码中, 这样就会导致, 打入了多个不同版本的依赖, 就像下图</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mage</span><br><span class="line">+-- node_modules</span><br><span class="line">  +-- react@16.13.1 // 计划使用宿主的react</span><br><span class="line">  +-- sugar-design@2.0.0 // &lt;- 我们自己的第三方库</span><br><span class="line">      +-- node_modules</span><br><span class="line">          +-- react@16.2.0 // 实际加载的是自己的依赖react</span><br></pre></td></tr></table></figure>
+<p>所以最好的方法是使用<code>peerDependencies</code>, 为什么不是<code>dependencies</code>呢? 因为<code>peerDependencies</code>可以保证你的第三方库不会额外引入一个<code>react</code> <code>react-dom</code>. 而像<code>react</code> <code>react-dom</code>这样的库, 因为设计原因, 同时引入多个可能会造成未知的错误, 而在排查这类bug的时候确往往是很困难的.</p>
+<p>如果真的发生了上面说的问题, 应该怎么办呢?</p>
+<h2 id="如何找到多次引入的第三方包呢"><a href="#如何找到多次引入的第三方包呢" class="headerlink" title="如何找到多次引入的第三方包呢?"></a>如何找到多次引入的第三方包呢?</h2><p>如果真的想确定是否有多个第三方库被引入呢? 以<code>rect</code>为例, 我这几个一个办法:</p>
+<p><strong>第一个</strong><br>你可以使用<code>npm</code>命令, 查看当前的dependency graph:<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm ls react</span><br></pre></td></tr></table></figure></p>
+<p>上面的命令可以查看, 到底项目里有多少个第三方库依赖<code>react</code>, 之后在逐一进行排查.</p>
+<p><strong>第二个</strong><br>首先在开发环境运行项目, 打开浏览器控制台: 按住 <code>command</code> + <code>p</code>, 并在出现的输入框中输入<code>react.dev</code></p>
+<p><img src="https://moka-sugar.oss-cn-beijing.aliyuncs.com/img/dedupe.png" alt></p>
+<p>如果出现多个结果, 但是来源却不一致, 就像上图一样, 那么恭喜你, 你已经找到了!</p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>所以, 请大家在写第三方库<code>package.json</code>的依赖部分时, 保持谨慎, 防止以外发生, 最好现在就去检查一下你写得第三方库是不是就有这类问题. 我相信将来<code>npm</code>也会为我们作更多的工作, 减少这些维护的成本.<br>因为<code>npm</code>一直再持续的迭代版本, 目前v7也在紧张的开发中, 这次带来了功能更强大的依赖树管理工具<a href="https://blog.npmjs.org/post/618653678433435649/npm-v7-series-arborist-deep-dive" target="_blank" rel="noopener">arborist</a>, 感兴趣的同学可以进行深入了解.</p>
+<h2 id="推荐阅读"><a href="#推荐阅读" class="headerlink" title="推荐阅读"></a>推荐阅读</h2><p><a href="https://medium.com/learnwithrahul/understanding-npm-dependency-resolution-84a24180901b" target="_blank" rel="noopener">Understanding npm dependency resolution</a></p>
+<p><a href="https://lexi-lambda.github.io/blog/2016/08/24/understanding-the-npm-dependency-model/" target="_blank" rel="noopener">Understanding the npm dependency model</a></p>
+<p><a href="https://docs.npmjs.com/cli-commands/install.html" target="_blank" rel="noopener">npm install guideline</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/07/28/理解前端依赖/" data-id="ckd5eq8f6000ftpro6ezl32qr" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2020/06/30/理解DSL/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">理解DSL</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/webpack/" style="font-size: 10px;">webpack</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/07/28/理解前端依赖/">理解前端依赖</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/30/理解DSL/">理解DSL</a>
+          </li>
+        
+          <li>
+            <a href="/2020/05/19/你真的知道react-redux是怎么运行的么/">你真的知道react-redux是怎么运行的么</a>
+          </li>
+        
+          <li>
+            <a href="/2020/04/27/如何设计一个简单的模块系统/">如何设计一个简单的模块系统</a>
+          </li>
+        
+          <li>
+            <a href="/2020/03/29/如何设计一个插件系统/">如何设计一个插件系统</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
